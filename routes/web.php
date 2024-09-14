@@ -21,7 +21,7 @@ use App\Http\Controllers\NurseController;
 // Authentication routes
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login']);
-Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
 // Admin routes
 Route::middleware(['auth', 'admin'])->group(function () {
