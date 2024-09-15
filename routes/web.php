@@ -38,6 +38,11 @@ Route::middleware(['auth', 'doctor'])->group(function () {
 // Nurse routes
 Route::middleware(['auth', 'nurse'])->group(function () {
     Route::get('nurse/dashboard', [NurseController::class, 'index'])->name('nurse.dashboard');
+    Route::get('/nurse/create-patient', [NurseController::class, 'createPatient'])->name('nurse.createPatient');
+    Route::post('/nurse/store-patient', [NurseController::class, 'storePatient'])->name('nurse.storePatient');
+    Route::get('/find-patient', [NurseController::class, 'findPatient'])->name('nurse.findPatient');
+
+
 });
 
 
