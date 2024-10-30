@@ -39,4 +39,10 @@ class Patient extends Model
 
         return $number;
     }
+
+    public function records()
+{
+    return $this->hasMany(Record::class, 'patient_id');
+}
+
 }

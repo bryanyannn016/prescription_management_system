@@ -6,6 +6,10 @@
     <!-- Add this in the head section of your layout file -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<!-- Add these in the head of your layout or blade file -->
+<link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+<script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+
 
 <style>
     body {
@@ -157,7 +161,7 @@
     width: 80%; /* Make sure table takes full width */
     table-layout: fixed; /* Fixes the layout of the table */
     height: 20%;
-    margin-top: 50px;
+    margin-top: 20px;
 }
 
 .patient-table th, .patient-table td {
@@ -263,7 +267,7 @@
 }
 
 .mb-4 {
-    margin-bottom: 0.4rem; /* Bottom margin for spacing */
+    //margin-bottom: 0.4rem; /* Bottom margin for spacing */
 }
 
 .form-group {
@@ -320,6 +324,45 @@
     margin-top: 20px;
 }
 
+.admit-patient-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.admit-patient-field {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 0.6rem; /* Reduced spacing between fields */
+}
+
+.admit-patient-label {
+    width: 200px; /* Adjust width as needed */
+    font-weight: bold;
+    color: #286187;
+    margin-right: 0; /* Reduced space between label and value */
+}
+
+.admit-patient-value {
+    margin: 0; /* Remove default margin for better alignment */
+}
+
+.admit-patient-select {
+    margin: 0;
+    padding: 0.25rem 0.5rem; /* Reduced padding for a smaller height */
+    font-size: 0.8rem; /* Adjust font size to make the dropdown appear smaller */
+    line-height: 1.2; /* Adjust line height for better vertical alignment */
+    color: #111111;
+    background-color: #ffffff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    width: auto; /* Adjust width as needed */
+    height: auto; /* Ensure height is controlled by padding and font size */
+}
+
+
+
+
 
 </style>
 
@@ -344,9 +387,17 @@
 
             <ul>
                 <li>
-                    <a href="{{ route('nurse.dashboard') }}" class="{{ request()->routeIs('nurse.dashboard') ? 'active' : '' }}">
+                    <a href="{{ route('nurse.dashboard') }}" 
+                       class="{{ request()->routeIs('nurse.dashboard', 'nurse.createPatient', 'nurse.savePatient', 'nurse.admitPatient', 'nurse.findPatient', 'nurse.selectPatient', 'nurse.viewPatientRecord', 'nurse.viewExistingPatientRecord') ? 'active' : '' }}">
                         <img src="{{ asset('admitting.png') }}" alt="Admitting Icon">
                         Admitting
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="{{ route('nurse.prescription_list') }}" class="{{ request()->routeIs('nurse.prescription_list', 'nurse.deferPatient') ? 'active' : '' }}">
+                        <img src="{{ asset('prescription.png') }}" alt="Prescription Icon">
+                        Prescription 
                     </a>
                 </li>
                 <!-- Add more sidebar links here -->

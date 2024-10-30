@@ -32,6 +32,8 @@
             </div>
         </div>
     </div>
+    <!-- Hidden input to indicate a search was made -->
+    <input type="hidden" name="searched" value="true">
 </form>
 
 @if(isset($patients) && $patients->count() > 0)
@@ -45,6 +47,8 @@
                     <th class="text-nowrap">Patient Number</th>
                     <th class="text-nowrap">Sex</th>
                     <th class="text-nowrap">Age</th>
+                    <th class="text-nowrap">Record</th>
+                    <th class="text-nowrap">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -56,18 +60,29 @@
                         <td>{{ $patient->patient_number }}</td>
                         <td>{{ $patient->sex }}</td>
                         <td>{{ $patient->age }}</td>
+                        <td>
+                            <form action="{{ route('nurse.viewPatientRecord', $patient->id) }}" method="GET">
+                                <button type="submit" class="btn" style="border-color: #C6E0FF; background-color: #C6E0FF; color: #000;"><strong>VIEW</strong></button>
+                            </form>
+                        </td>
+                        <td>
+                            <form action="{{ route('nurse.selectPatient') }}" method="GET">
+                                <input type="hidden" name="patient_id" value="{{ $patient->id }}">
+                                <button type="submit" class="btn" style="border-color: #C6E0FF; background-color: #C6E0FF; color: #000;"><strong>SELECT</strong></button>
+                            </form>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
-@elseif(isset($patients) && $patients->count() === 0)
+@elseif(isset($patients) && $patients->count() === 0 && request()->input('searched'))
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var popup = document.getElementById('noRecordsPopup');
             var overlay = document.getElementById('overlay');
 
-            // Show the pop-up and overlay if no records are found
+            // Show the pop-up and overlay if no records are found and a search was performed
             popup.style.display = 'block';
             overlay.style.display = 'block';
         });
@@ -78,6 +93,7 @@
             var overlay = document.getElementById('overlay');
             popup.style.display = 'none';
             overlay.style.display = 'none';
+            window.location.href = "{{ route('nurse.dashboard') }}";
         }
 
         // Function to confirm and route to the patient creation page
@@ -88,12 +104,16 @@
 @endif
 
 <!-- Overlay and Pop-up -->
-<div class="overlay" id="overlay"></div>
-<div class="popup-container" id="noRecordsPopup">
+<div class="overlay" id="overlay" style="display: none;"></div>
+<div class="popup-container" id="noRecordsPopup" style="display: none;">
     <p>No records found!</p>
     <p>Would you like to add new patient?</p>
     <button class="confirm-btn" onclick="confirmPopup()">CONFIRM</button>
     <button class="cancel-btn" onclick="closePopup()">CANCEL</button>
 </div>
+
+<script>
+ 
+</script>
 
 @endsection

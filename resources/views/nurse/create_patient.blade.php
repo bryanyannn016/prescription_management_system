@@ -6,7 +6,7 @@
 
 <h2 style="margin-left:50px;">Add Patient</h2>
     <div class="container mt-4">
-        <form id="create-patient-form" method="POST" action="{{ route('nurse.storePatient') }}" class="custom-form-margin">
+        <form id="create-patient-form" method="POST" action="{{ route('nurse.savePatient') }}" class="custom-form-margin">
             @csrf
             <div class="mb-4">
                 <label for="first_name" class="form-label custom-label">
@@ -20,7 +20,7 @@
                 </label>
                 <input type="text" class="form-control custom-input" id="middle_name" name="middle_name" placeholder="Middle Name">
                 <div class="form-check mt-2">
-                    <input class="form-check-input" type="checkbox" id="no_middle_name" name="no_middle_name">
+                    <input class="form-check-input" type="checkbox" id="no_middle_name" name="no_middle_name" value="1">
                     <label class="form-check-label custom-checkbox-label" for="no_middle_name">
                         Check if no middle name
                     </label>
@@ -95,7 +95,7 @@
                     <option value="Urdaneta">Urdaneta</option>
                 </select>
                 <div class="form-check mt-2">
-                    <input class="form-check-input" type="checkbox" id="outside_makati" name="outside_makati">
+                    <input class="form-check-input" type="checkbox" id="outside_makati" name="outside_makati"  value="1">
                     <label class="form-check-label custom-checkbox-label" for="outside_makati">
                         Check if outside Makati
                     </label>
