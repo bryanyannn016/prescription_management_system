@@ -69,7 +69,12 @@
                                         @csrf
                                         <input type="hidden" name="patient_id" value="{{ $patient->id }}">
                                         <input type="hidden" name="record_id" value="{{ $record->id }}"> <!-- Add the record_id -->
-                                        <button type="submit" class="btn" style="border-color: #C6E0FF; background-color: #C6E0FF; color: #000;"><strong>SELECT</strong></button>
+                                        @if($record->service == 'Medical Consultation (Face to Face)' && \App\Models\Prescription::where('record_id', $record->id)->exists())
+                                            <!-- If prescription exists, show "DONE" -->
+                                            <strong>DONE</strong>
+                                        @else
+                                            <button type="submit" class="btn" style="border-color: #C6E0FF; background-color: #C6E0FF; color: #000;"><strong>SELECT</strong></button>
+                                        @endif
                                     </form>
                                 </td>
                             </tr>
@@ -82,6 +87,5 @@
 @else
     <p>No patients found.</p>
 @endif
-
 
 @endsection

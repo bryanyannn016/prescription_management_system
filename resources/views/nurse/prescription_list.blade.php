@@ -85,6 +85,9 @@
             </thead>
             <tbody>
                 @foreach($admitPatientDetails as $patient)
+                    @php
+                        $record = $admitPatientRecords->firstWhere('patient_id', $patient->id);
+                    @endphp
                     <tr>
                         <td>{{ $patient->last_name }}</td>
                         <td>{{ $patient->first_name }}</td>
@@ -94,15 +97,17 @@
                         <td>{{ $patient->age }}</td>
                         <td>{{ $patient->barangay }}</td>
                         <td>
-                            
+                            @if($record && !$record->has_prescription)
                                 <form action="{{ route('nurse.refillPatient') }}" method="GET">
                                     <input type="hidden" name="patient_id" value="{{ $patient->id }}">
+                                    <input type="hidden" name="record_id" value="{{ $record->id }}">
                                     <button type="submit" class="btn" style="background-color: #C6E0FF; border-color: #C6E0FF; color: #000;">
                                         <strong>SELECT</strong>
                                     </button>
                                 </form>
-                            
-                            
+                            @else
+                                <span class="text-muted" style="font-weight: bold">DONE</span>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
@@ -110,6 +115,7 @@
         </table>
     </div>
 @endif
+
 
 {{-- Table for Refill Patients --}}
 @if(isset($refillPatientDetails) && $refillPatientDetails->count() > 0)

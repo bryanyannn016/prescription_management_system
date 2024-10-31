@@ -41,7 +41,7 @@ Route::middleware(['auth', 'doctor'])->group(function () {
     Route::post('/store-diagnosis', [DoctorController::class, 'storeDiagnosis'])->name('store.diagnosis');
     Route::get('/doctor/prescription/{patient_id}/{record_id}', [DoctorController::class, 'prescription'])->name('doctor.prescription');
     Route::post('/doctor/store-prescription', [DoctorController::class, 'storePrescription'])->name('doctor.storePrescription');
-
+    
 });
 
 // Nurse routes

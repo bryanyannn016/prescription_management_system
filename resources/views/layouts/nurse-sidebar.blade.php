@@ -395,7 +395,7 @@
                 </li>
                 
                 <li>
-                    <a href="{{ route('nurse.prescription_list') }}" class="{{ request()->routeIs('nurse.prescription_list', 'nurse.deferPatient') ? 'active' : '' }}">
+                    <a href="{{ route('nurse.prescription_list') }}" class="{{ request()->routeIs('nurse.prescription_list', 'nurse.deferPatient', 'nurse.refillPatient') ? 'active' : '' }}">
                         <img src="{{ asset('prescription.png') }}" alt="Prescription Icon">
                         Prescription 
                     </a>

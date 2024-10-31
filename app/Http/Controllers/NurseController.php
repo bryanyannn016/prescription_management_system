@@ -342,8 +342,7 @@ public function prescriptionList()
     // Get admitted patients for 'Refill' from the records table
     $admitPatients = Record::where('service', 'Refill')
         ->where('date', $today)
-        ->pluck('patient_id')
-        ->unique();
+        ->get(['id', 'patient_id']); // Get both record_id and patient_id
 
     // Get refill patients from the prescription table with today's refill date
     $refillPatients = Prescription::where('refill_date', $today)
@@ -360,13 +359,20 @@ public function prescriptionList()
                 ->exists();
         });
 
-    // Retrieve patient details for both sets
-    $admitPatientDetails = Patient::whereIn('id', $admitPatients)->get();
+    // Retrieve patient details for admitted and refill patients
+    $admitPatientDetails = Patient::whereIn('id', $admitPatients->pluck('patient_id'))->get();
     $refillPatientDetails = Patient::whereIn('id', $refillPatients)->get();
 
-    // Pass both patient sets to the view
-    return view('nurse.prescription_list', compact('admitPatientDetails', 'refillPatientDetails'));
+    // Check for each admitted patient's record_id in the prescriptions table
+    $admitPatientRecords = $admitPatients->map(function ($record) {
+        $record->has_prescription = Prescription::where('record_id', $record->id)->exists();
+        return $record;
+    });
+
+    // Pass all required data to the view
+    return view('nurse.prescription_list', compact('admitPatientDetails', 'refillPatientDetails', 'admitPatientRecords'));
 }
+
 
 
 

@@ -69,7 +69,7 @@
                         <td class="table-data">{{ $prescription->last_prescribed }}</td>
                         <td class="table-data">
                             <button class="btn btn-primary btn-sm add-btn"
-                                    onclick="addMedication(this, '{{ $prescription->medication }}', '{{ $prescription->sig }}')">
+                                    onclick="addMedication(this, '{{ $prescription->medication }}', '{{ $prescription->sig }}')" style="background-color: #C6E0FF; border-color: #C6E0FF; color: #000; font-weight: bold">
                                 ADD
                             </button>
                         </td>
@@ -102,13 +102,14 @@
 
         <!-- Refill Date Input -->
         <div class="mt-3" style="margin-top:50px;">
-            <label class="label-color" for="refill-date">Refill Date:</label>
+            <label class="label-color" for="refill-date" style="font-weight: bold">Refill Date:</label>
             <input type="date" id="refill-date" class="form-control" min="" />
         </div>
 
         <!-- Submit Button -->
-        <div class="mt-4" style="margin-top:50px; margin-left:100px;">
-            <button class="btn btn-success" onclick="submitRefill()">SUBMIT</button>
+        <div class="mt-4" style="margin-top:80px; margin-left:400px;">
+            <button class="btn btn-success" onclick="submitRefill()" style="background-color: #C6E0FF; border-color: #C6E0FF; color: #000; margin-right:75px; font-weight: bold">SUBMIT</button>
+            <button class="btn btn-danger" onclick="window.location.href='{{ route('nurse.prescription_list') }}'" style="background-color: #C6E0FF; border-color: #C6E0FF; color: #000; margin-right: 10px; font-weight: bold">BACK</button>
         </div>
     </div>
     </div>
@@ -162,7 +163,7 @@ function addMedication(button, medication, sig) {
         <td class="table-data">${medication}</td>
         <td class="table-data">${quantity}</td>
         <td class="table-data">${sig}</td>
-        <td class="table-data"><button class="btn btn-danger btn-sm" onclick="removeMedication(this)">REMOVE</button></td>
+        <td class="table-data"><button class="btn btn-danger btn-sm" onclick="removeMedication(this)" style="background-color: #C6E0FF; border-color: #C6E0FF; color: #000; font-weight: bold">REMOVE</button></td>
     `;
 
     // Store the date_started as a data attribute in the row
