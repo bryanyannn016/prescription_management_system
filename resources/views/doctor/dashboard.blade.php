@@ -53,8 +53,8 @@
             </thead>
             <tbody>
                 @foreach($patients as $patient)
-                    @foreach($patient->records as $record) <!-- Loop through each record for the patient -->
-                        @if($record->status == 'Pending' || $record->service == 'Medical Consultation (Face to Face)')
+                    @foreach($patient->records as $record)
+                        @if($record->service == 'Refill' || $record->service == 'Medical Consultation (Face to Face)')
                             <tr>
                                 <td>{{ $patient->last_name }}</td>
                                 <td>{{ $patient->first_name }}</td>
@@ -63,19 +63,19 @@
                                 <td>{{ $patient->sex }}</td>
                                 <td>{{ $patient->age }}</td>
                                 <td>{{ $patient->barangay }}</td>
-                                <td>{{ $record->service }}</td> <!-- Displaying Service from the record -->
+                                <td>{{ $record->service }}</td>
                                 <td>
-                                    <form action="{{ route('doctor.selectPatient') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="patient_id" value="{{ $patient->id }}">
-                                        <input type="hidden" name="record_id" value="{{ $record->id }}"> <!-- Add the record_id -->
-                                        @if($record->service == 'Medical Consultation (Face to Face)' && \App\Models\Prescription::where('record_id', $record->id)->exists())
-                                            <!-- If prescription exists, show "DONE" -->
-                                            <strong>DONE</strong>
-                                        @else
+                                    @if($record->service == 'Refill' && $record->status == 'Approved')
+                                        <strong>DONE</strong>
+                                    @elseif($record->service == 'Medical Consultation (Face to Face)' && \App\Models\Prescription::where('record_id', $record->id)->exists())
+                                        <strong>DONE</strong>
+                                    @else
+                                        <form action="{{ $record->service == 'Refill' ? route('doctor.docRefill') : route('doctor.selectPatient') }}" method="GET">
+                                            <input type="hidden" name="patient_id" value="{{ $patient->id }}">
+                                            <input type="hidden" name="record_id" value="{{ $record->id }}">
                                             <button type="submit" class="btn" style="border-color: #C6E0FF; background-color: #C6E0FF; color: #000;"><strong>SELECT</strong></button>
-                                        @endif
-                                    </form>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @endif

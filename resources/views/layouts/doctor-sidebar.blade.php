@@ -211,7 +211,8 @@
 
             <ul>
                 <li>
-                    <a href="{{ route('doctor.dashboard') }}" class="{{ request()->routeIs('doctor.dashboard') ? 'active' : '' }}">
+                    <a href="{{ route('doctor.dashboard') }}" class="{{ request()->routeIs('doctor.dashboard', 'doctor.findPatient', 'doctor.selectPatient', 'doctor.diagnosis', 'doctor.prescription',
+                    'doctor.docRefill') ? 'active' : '' }}">
                         <img src="{{ asset('patient-list.png') }}" alt="Patient List Icon">
                         Patient List
                     </a>

@@ -20,7 +20,7 @@ class DoctorController extends Controller
         $query = Patient::with(['records' => function ($query) use ($currentDate) {
             $query->whereDate('date', $currentDate) // Filter by current date
                   ->where(function ($query) {
-                      $query->where('status', 'Pending')
+                      $query->where('service', 'Refill')
                             ->orWhere('service', 'Medical Consultation (Face to Face)');
                   });
         }])->whereHas('records', function ($query) use ($currentDate) {
@@ -234,6 +234,75 @@ public function storePrescription(Request $request)
 
     return response()->json(['success' => true, 'message' => 'Prescription saved successfully!']);
 }
+
+public function docRefill(Request $request)
+{
+    $patientId = $request->input('patient_id');
+    $recordId = $request->input('record_id');
+
+    $patient = Patient::with('records')->find($patientId);
+    $record = Record::find($recordId);
+    
+    // Fetch the prescriptions related to the record
+    $prescriptions = Prescription::where('record_id', $recordId)->get();
+
+    // Get the refill date from one of the prescriptions (assuming they share the same date)
+    $refillDate = $prescriptions->first()->refill_date ?? null;
+
+    return view('doctor.docRefill', compact('patient', 'record', 'prescriptions', 'refillDate'));
+}
+
+public function submitRefill(Request $request, $recordId)
+{
+    // Get the form inputs
+    $quantities = $request->input('quantity', []);
+    $refillables = $request->input('refillable', []);
+    $refillDate = $request->input('refill_date');
+
+    // Retrieve all prescriptions linked to the specified record ID
+    $prescriptions = Prescription::where('record_id', $recordId)->get();
+
+    foreach ($prescriptions as $prescription) {
+        // Update the quantity for each prescription
+        if (isset($quantities[$prescription->id])) {
+            $prescription->quantity = $quantities[$prescription->id];
+        }
+
+        // Update the isRefillable status
+        $prescription->isRefillable = isset($refillables[$prescription->id]) ? true : false;
+
+        // Update the refill date
+        $prescription->refill_date = $refillDate;
+
+        // Save changes to the prescription
+        $prescription->save();
+    }
+
+    // Update the status in the records table
+    $record = Record::find($recordId);
+    if ($record) {
+        $record->status = 'Approved';
+        $record->save();
+    }
+
+    // Redirect back to the doctor dashboard after updating
+    return redirect()->route('doctor.dashboard')->with('success', 'Prescription refills updated successfully, and record status set to Approved.');
+}
+
+
+public function removePrescription($id)
+{
+    $prescription = Prescription::find($id);
+    
+    if ($prescription) {
+        $prescription->delete(); // Remove from the database
+        return response()->json(['success' => true]);
+    }
+    
+    return response()->json(['success' => false], 404); // Not found
+}
+
+
 
 
     

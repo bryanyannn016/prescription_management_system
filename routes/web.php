@@ -36,12 +36,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
 Route::middleware(['auth', 'doctor'])->group(function () {
     Route::get('doctor/dashboard', [DoctorController::class, 'index'])->name('doctor.dashboard');
     Route::get('/doctor/find-patient', [DoctorController::class, 'findPatient'])->name('doctor.findPatient');
-    Route::post('/doctor/selectPatient', [DoctorController::class, 'selectPatient'])->name('doctor.selectPatient');
+    Route::get('/doctor/selectPatient', [DoctorController::class, 'selectPatient'])->name('doctor.selectPatient');
     Route::get('/doctor/diagnosis/{patient_id}/{record_id}', [DoctorController::class, 'showDiagnosis'])->name('doctor.diagnosis');
     Route::post('/store-diagnosis', [DoctorController::class, 'storeDiagnosis'])->name('store.diagnosis');
     Route::get('/doctor/prescription/{patient_id}/{record_id}', [DoctorController::class, 'prescription'])->name('doctor.prescription');
     Route::post('/doctor/store-prescription', [DoctorController::class, 'storePrescription'])->name('doctor.storePrescription');
-    
+    Route::get('/doctor/docRefill', [DoctorController::class, 'docRefill'])->name('doctor.docRefill');
+    Route::post('/doctor/submitRefill/{id}', [DoctorController::class, 'submitRefill'])->name('doctor.submitRefill');
+    Route::delete('/doctor/prescription/remove/{id}', [DoctorController::class, 'removePrescription'])->name('doctor.removePrescription');
+
 });
 
 // Nurse routes
