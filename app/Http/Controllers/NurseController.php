@@ -118,8 +118,6 @@ class NurseController extends Controller
     $record->service = $request->input('service'); // Use the service from the request
     $record->status = $request->input('service') === 'Medical Consultation (Face to Face)' ? 'Approved' : 'Pending'; // Determine status
     $record->date = now(); // Set current date
-    $record->prescription_id = null; // Set to null for now
-    $record->final_diagnosis = json_encode([]); // Initialize as empty JSON array for diagnosis
     $record->save(); // Save the record
 
     // Handle file uploads
@@ -145,9 +143,6 @@ class NurseController extends Controller
     // Redirect with success message
     return redirect()->route('nurse.dashboard')->with('success', 'Patient admitted successfully!');
 }
-
-    
-
 
     
     public function findPatient(Request $request)
@@ -529,7 +524,71 @@ public function storeRefill(Request $request)
 }
 
 
+public function patient_list()
+{
+    // Retrieve all records with 'service' and 'status' columns
+    $records = Record::select('id', 'service', 'status', 'patient_id', 'created_at')->get();
 
+    // Loop through records to add patient information based on patient_id
+    foreach ($records as $record) {
+        // Retrieve patient information for each record
+        $record->patient = Patient::where('id', $record->patient_id)->first();
+    }
+
+    // Pass the records to the view
+    return view('nurse.patient_list', ['records' => $records]);
+}
+
+public function findPatientRecord(Request $request)
+{
+    // Validate the input
+    $request->validate([
+        'lastName' => 'nullable|string|max:255',
+        'firstName' => 'nullable|string|max:255',
+        'dob' => 'nullable|date',
+        'middleName' => 'nullable|string|max:255',
+    ]);
+
+    // Initialize the query for Record model
+    $query = Record::query();
+
+    // Check if the last name is filled and apply the filter
+    if ($request->filled('lastName')) {
+        $query->whereHas('patient', function ($q) use ($request) {
+            $q->where('last_name', 'like', '%' . $request->input('lastName') . '%');
+        });
+    }
+
+    // Check if the first name is filled and apply the filter
+    if ($request->filled('firstName')) {
+        $query->whereHas('patient', function ($q) use ($request) {
+            $q->where('first_name', 'like', '%' . $request->input('firstName') . '%');
+        });
+    }
+
+    // Check if the date of birth is filled and apply the filter
+    if ($request->filled('dob')) {
+        $query->whereHas('patient', function ($q) use ($request) {
+            $q->whereDate('birthday', $request->input('dob'));
+        });
+    }
+
+    // Check if the middle name is filled and apply the filter
+    if ($request->filled('middleName')) {
+        $query->whereHas('patient', function ($q) use ($request) {
+            $q->where('middle_name', 'like', '%' . $request->input('middleName') . '%');
+        });
+    }
+
+    // Get the results
+    $records = $query->get();
+
+    // Determine if no records were found
+    $noRecordsFound = $records->isEmpty();
+
+    // Pass the records and noRecordsFound flag to the view
+    return view('nurse.patient_list', compact('records', 'noRecordsFound'));
+}
 
 
 

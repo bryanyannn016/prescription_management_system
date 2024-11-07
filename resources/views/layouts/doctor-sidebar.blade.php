@@ -217,6 +217,12 @@
                         Patient List
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('doctor.allPatients') }}" class="{{ request()->routeIs('doctor.allPatients', 'doctor.recordfindPatient', 'doctor.viewPatientRecord','doctor.viewExistingPatientRecord') ? 'active' : '' }}">
+                        <img src="{{ asset('patient-records.png') }}" alt="Patient Records Icon">
+                        Patient Records
+                    </a>
+                </li>
                 <!-- Add more sidebar links here -->
             </ul>
         </div>

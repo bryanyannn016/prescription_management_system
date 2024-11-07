@@ -14,8 +14,6 @@ class Record extends Model
         'service',
         'status',
         'date',
-        'prescription_id',
-        'final_diagnosis',
     ];
 
     public function files()
@@ -36,6 +34,10 @@ public function prescriptions()
     return $this->hasMany(Prescription::class);
 }
 
+public function patient()
+{
+    return $this->belongsTo(Patient::class);
+}
     
 }
 

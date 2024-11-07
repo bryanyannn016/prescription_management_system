@@ -14,8 +14,6 @@ class CreateRecordsTable extends Migration
             $table->string('service');
             $table->string('status')->default('Pending'); // Default status to Pending
             $table->date('date')->default(now()); // Current date
-            $table->string('prescription_id')->nullable(); // Prescription ID can be nullable
-            $table->json('final_diagnosis')->nullable(); // Store multiple diagnoses as JSON
             $table->timestamps();
         });
     }

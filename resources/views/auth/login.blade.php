@@ -177,6 +177,18 @@
         <div class="form-container">
             <form method="POST" action="{{ url('login') }}">
                 @csrf
+
+                <!-- Displaying error message if any -->
+                @if ($errors->any())
+                    <div class="form-group" style="color: red;">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                
                 <div class="form-group">
                     <input type="email" name="email" placeholder="Email" required>
                 </div>

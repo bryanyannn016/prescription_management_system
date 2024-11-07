@@ -8,6 +8,7 @@ use App\Models\Record;
 use App\Models\Medication;
 use App\Models\Prescription;
 use App\Models\Diagnosis;
+use App\Models\File; 
 
 class DoctorController extends Controller
 {
@@ -302,8 +303,98 @@ public function removePrescription($id)
     return response()->json(['success' => false], 404); // Not found
 }
 
+public function allPatients()
+{
+    $patients = Patient::all();
+    return view('doctor.records', compact('patients'));
+}
 
-
-
+public function recordfindPatient(Request $request)
+    {
+        // Validate the input
+        $request->validate([
+            'lastName' => 'nullable|string|max:255',
+            'firstName' => 'nullable|string|max:255',
+            'dob' => 'nullable|date',
+            'middleName' => 'nullable|string|max:255',
+        ]);
     
+        // Initialize the query to fetch patients
+        $query = Patient::query();
+    
+        // Build the query based on provided input
+        if ($request->filled('lastName')) {
+            $query->where('last_name', 'like', '%' . $request->input('lastName') . '%');
+        }
+        if ($request->filled('firstName')) {
+            $query->where('first_name', 'like', '%' . $request->input('firstName') . '%');
+        }
+        if ($request->filled('dob')) {
+            $query->whereDate('birthday', $request->input('dob'));
+        }
+        if ($request->filled('middleName')) { 
+            $query->where('middle_name', 'like', '%' . $request->input('middleName') . '%');
+        }
+    
+        // Get the results
+        $patients = $query->get();
+    
+        // Determine if no records were found
+        $noRecordsFound = $patients->isEmpty();
+    
+        if ($request->ajax()) {
+            return response()->json(['noRecordsFound' => $noRecordsFound]);
+        }
+    
+        // Return the view with the results and the flag
+        return view('doctor.records', compact('patients', 'noRecordsFound'));
+    }
+
+    public function viewPatientRecord($id)
+    {
+        // Retrieve the patient by ID
+        $patient = Patient::findOrFail($id); 
+    
+        // Retrieve all records associated with the patient
+        $records = Record::where('patient_id', $id)->get();
+    
+        // Return a view and pass the patient and records data
+        return view('doctor.view_patient_record', compact('patient', 'records'));
+    }
+
+    public function viewExistingPatientRecord($patient_id, $record_id)
+{
+    // Fetch patient details
+    $patient = Patient::findOrFail($patient_id);
+
+    // Fetch record details
+    $record = Record::findOrFail($record_id);
+
+    $diagnoses = collect(); // Default empty collection for diagnoses
+
+    if ($record->service === 'Refill') {
+        // Search for a "Medical Consultation (Face to Face)" record for the same patient
+        $consultationRecord = Record::where('patient_id', $patient_id)
+                                    ->where('service', 'Medical Consultation (Face to Face)')
+                                    ->first();
+
+        if ($consultationRecord) {
+            // Fetch ongoing diagnoses from the consultation record
+            $diagnoses = Diagnosis::where('record_id', $consultationRecord->id)
+                                  ->where('isOngoing', true)
+                                  ->get();
+        }
+    } else {
+        // Fetch diagnoses associated with the current record
+        $diagnoses = Diagnosis::where('record_id', $record_id)->get();
+    }
+
+    // Fetch prescriptions and files as usual
+    $prescriptions = Prescription::where('record_id', $record_id)->get();
+    $files = File::where('record_id', $record_id)->get();
+
+    // Pass data to the view
+    return view('doctor.patient_record_view', compact('patient', 'record', 'diagnoses', 'prescriptions', 'files'));
+}
+
 }

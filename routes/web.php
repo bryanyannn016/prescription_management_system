@@ -30,6 +30,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('admin/create-account', [AdminController::class, 'showCreateAccountForm'])->name('admin.create-account');
     Route::post('admin/create-account', [AdminController::class, 'createAccount']);
+    Route::get('/admin/account-list', [AdminController::class, 'accountList'])->name('admin.account-list');
+    Route::get('/admin/account/{id}/edit', [AdminController::class, 'editAccount'])->name(name: 'admin.edit-account');
+    Route::post('/admin/user/update/{id}', [AdminController::class, 'update'])->name('admin.update');
+    Route::patch('/admin/update-status/{id}', [AdminController::class, 'updateStatus'])->name('admin.update-status');
+
 });
 
 // Doctor routes
@@ -44,6 +49,10 @@ Route::middleware(['auth', 'doctor'])->group(function () {
     Route::get('/doctor/docRefill', [DoctorController::class, 'docRefill'])->name('doctor.docRefill');
     Route::post('/doctor/submitRefill/{id}', [DoctorController::class, 'submitRefill'])->name('doctor.submitRefill');
     Route::delete('/doctor/prescription/remove/{id}', [DoctorController::class, 'removePrescription'])->name('doctor.removePrescription');
+    Route::get('/doctor/records/find-patient', [DoctorController::class, 'recordfindPatient'])->name('doctor.recordfindPatient');
+    Route::get('doctor/records/dashboard', [DoctorController::class, 'allPatients'])->name('doctor.allPatients');
+    Route::get('/doctor/patient/{id}/records', [DoctorController::class, 'viewPatientRecord'])->name('doctor.viewPatientRecord');
+    Route::get('/doctor/patient/{patient_id}/record/{record_id}', [DoctorController::class, 'viewExistingPatientRecord'])->name('doctor.viewExistingPatientRecord');
 
 });
 
@@ -65,6 +74,8 @@ Route::middleware(['auth', 'nurse'])->group(function () {
     Route::post('/nurse/defer-refill-date', [NurseController::class, 'deferRefillDate'])->name('nurse.deferRefillDate');
     Route::get('/nurse/refill-patient', [NurseController::class, 'refillPatient'])->name('nurse.refillPatient');
     Route::post('/nurse/refill', [NurseController::class, 'storeRefill'])->name('nurse.refill');
+    Route::get('/nurse/patient-list', [NurseController::class, 'patient_list'])->name('nurse.patient_list');
+    Route::get('/find-patientrecord', [NurseController::class, 'findPatientRecord'])->name('nurse.findPatientRecord');
 
 
 });

@@ -158,7 +158,7 @@
 
 .patient-table {
     border-collapse: collapse; /* Ensures borders are collapsed to prevent extra spacing */
-    width: 80%; /* Make sure table takes full width */
+    width: 90%; /* Make sure table takes full width */
     table-layout: fixed; /* Fixes the layout of the table */
     height: 20%;
     margin-top: 20px;
@@ -398,6 +398,13 @@
                     <a href="{{ route('nurse.prescription_list') }}" class="{{ request()->routeIs('nurse.prescription_list', 'nurse.deferPatient', 'nurse.refillPatient') ? 'active' : '' }}">
                         <img src="{{ asset('prescription.png') }}" alt="Prescription Icon">
                         Prescription 
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('nurse.patient_list') }}" class="{{ request()->routeIs('nurse.patient_list', 'nurse.findPatientRecord') ? 'active' : '' }}">
+                        <img src="{{ asset('patient-list.png') }}" alt="Patient List Icon">
+                        Patient List
                     </a>
                 </li>
                 <!-- Add more sidebar links here -->

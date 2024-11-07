@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('password');
             $table->enum('type', ['admin', 'doctor', 'nurse']);
             $table->string('health_facility')->nullable();
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->rememberToken();
             $table->timestamps();
         });

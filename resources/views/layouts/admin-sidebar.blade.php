@@ -205,6 +205,45 @@
 
 }
 
+.account-table {
+    border-collapse: collapse; /* Collapses borders for a seamless design */
+    width: 100%; /* Ensures the table takes full width */
+    table-layout: fixed; /* Ensures fixed column layout */
+    height: 10%; /* Adjusts height based on content */
+    margin-top: 30px; /* Adds spacing at the top */
+}
+
+.account-table th, .account-table td {
+    padding: 4px; /* Provides comfortable padding for content */
+    border: 1px solid #ddd; /* Light gray border for clarity */
+    text-align: center; /* Centers text horizontally */
+    vertical-align: middle; /* Centers text vertically */
+}
+
+.account-table th {
+    background-color: #C6E0FF; /* Light background for headers */
+    font-weight: bold;
+}
+
+.account-table td {
+    vertical-align: middle; /* Ensure vertical alignment in cells */
+}
+
+.account-table tr {
+    height: 40px; /* Adjust height as needed */
+}
+
+.account-table tr:hover {
+    background-color: #f1f8ff; /* Adds a subtle hover effect */
+}
+
+.account-table .action-buttons {
+    display: flex; /* Display buttons in row */
+    justify-content: center; /* Center align buttons */
+    gap: 10px; /* Adds space between action buttons */
+}
+
+
 
 
     </style>
@@ -234,6 +273,12 @@
                     <a href="{{ route('admin.create-account') }}" class="{{ request()->routeIs('admin.create-account') ? 'active' : '' }}">
                         <img src="{{ asset('account-creation.png') }}" alt="Account Creation Icon">
                         Account Creation
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.account-list') }}" class="{{ request()->routeIs('admin.account-list', 'admin.edit-account') ? 'active' : '' }}">
+                        <img src="{{ asset('account-list.png') }}" alt="Account List Icon">
+                        Account List
                     </a>
                 </li>
                 <!-- Add more sidebar links here -->

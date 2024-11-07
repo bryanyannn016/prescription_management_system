@@ -49,15 +49,31 @@
                 <label for="health_facility" class="form-label custom-label">
                     <span class="required-asterisk">*</span> Health Facility:
                 </label>
-                <select id="health_facility" name="health_facility" class="form-select custom-input">
+                <select id="health_facility" name="health_facility" class="form-select custom-input" required>
                     <option value="bangkal_health_center">Bangkal Health Center</option>
-                    <option value="pembo_health_center">Pembo Health Center</option>
-                    <option value="makati_health_center">Makati Health Center</option>
+                    <option value="bangkal_lying_in">Bangkal Lying-In</option>
+                    <option value="carmona">Carmona</option>
+                    <option value="kasilawan">Kasilawan</option>
+                    <option value="la_paz">La Paz</option>
+                    <option value="olympia">Olympia</option>
+                    <option value="palanan">Palanan</option>
+                    <option value="pio_del_pilar_pc">Pio Del Pilar PC</option>
+                    <option value="pio_del_pilar_rhu">Pio Del Pilar RHU</option>
+                    <option value="poblacion">Poblacion</option>
+                    <option value="san_antonio">San Antonio</option>
+                    <option value="san_isidro">San Isidro</option>
+                    <option value="santa_cruz">Santa Cruz</option>
+                    <option value="singkamas">Singkamas</option>
+                    <option value="tejeros">Tejeros</option>
+                    <option value="guadalupe_nuevo">Guadalupe Nuevo</option>
+                    <option value="guadalupe_nuevo_lying_in">Guadalupe Nuevo Lying-In</option>
+                    <option value="guadalupe_viejo">Guadalupe Viejo</option>
+                    <option value="pinagkaisahan">Pinagkaisahan</option>
                 </select>
-            </div>
-            <div class="d-flex align-items-center">
-                <button type="submit" class="btn btn-primary" style="font-weight: bold; margin-right: 60px; margin-left: 30px; border: 1px solid #ADADAD; border-radius: 0.5rem; width:100px;">SUBMIT</button>
-                <button type="button" class="btn btn-secondary" id="clear-button" style="font-weight: bold; border: 1px solid #ADADAD; border-radius: 0.5rem; width:100px;">CLEAR</button>
+            </div>            
+            <div class="d-flex align-items-center" style="margin-left:150px; margin-top:50px;">
+                <button type="submit" class="btn btn-primary" style="margin-right:100px; background-color: #C6E0FF; border-color: #C6E0FF; color: #000; font-weight: bold">SUBMIT</button>
+                <button type="button" class="btn btn-secondary" id="clear-button" style="background-color: #C6E0FF; border-color: #C6E0FF; color: #000; font-weight: bold">CLEAR</button>
             </div>
         </form>
     </div>
