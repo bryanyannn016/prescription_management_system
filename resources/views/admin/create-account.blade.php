@@ -71,7 +71,7 @@
                     <option value="pinagkaisahan">Pinagkaisahan</option>
                 </select>
             </div>            
-            <div class="d-flex align-items-center" style="margin-left:150px; margin-top:50px;">
+            <div class="d-flex align-items-center" style="margin-left:200px; margin-top:50px;">
                 <button type="submit" class="btn btn-primary" style="margin-right:100px; background-color: #C6E0FF; border-color: #C6E0FF; color: #000; font-weight: bold">SUBMIT</button>
                 <button type="button" class="btn btn-secondary" id="clear-button" style="background-color: #C6E0FF; border-color: #C6E0FF; color: #000; font-weight: bold">CLEAR</button>
             </div>

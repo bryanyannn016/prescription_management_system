@@ -27,13 +27,14 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
 // Admin routes
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('admin/dashboard', [AdminController::class, 'reports'])->name('admin.reports');
     Route::get('admin/create-account', [AdminController::class, 'showCreateAccountForm'])->name('admin.create-account');
     Route::post('admin/create-account', [AdminController::class, 'createAccount']);
     Route::get('/admin/account-list', [AdminController::class, 'accountList'])->name('admin.account-list');
     Route::get('/admin/account/{id}/edit', [AdminController::class, 'editAccount'])->name(name: 'admin.edit-account');
     Route::post('/admin/user/update/{id}', [AdminController::class, 'update'])->name('admin.update');
     Route::patch('/admin/update-status/{id}', [AdminController::class, 'updateStatus'])->name('admin.update-status');
+    //Route::get('/admin/reports', [AdminController::class, 'reports'])->name('admin.reports');
 
 });
 

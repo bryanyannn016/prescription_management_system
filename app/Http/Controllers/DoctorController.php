@@ -8,89 +8,109 @@ use App\Models\Record;
 use App\Models\Medication;
 use App\Models\Prescription;
 use App\Models\Diagnosis;
+use App\Models\User;
 use App\Models\File; 
 
 class DoctorController extends Controller
 {
     public function index(Request $request)
-    {
-        // Get the current date
-        $currentDate = now()->toDateString(); // Format: YYYY-MM-DD
+{
+    // Get the current date
+    $currentDate = now()->toDateString(); // Format: YYYY-MM-DD
     
-        // Base query to fetch patients with records for the current date
-        $query = Patient::with(['records' => function ($query) use ($currentDate) {
+    // Get the health facility of the authenticated user
+    $userHealthFacility = auth()->user()->health_facility;
+
+    // Base query to fetch patients with records for the current date and matching health facility
+    $query = Patient::with(['records' => function ($query) use ($currentDate, $userHealthFacility) {
             $query->whereDate('date', $currentDate) // Filter by current date
                   ->where(function ($query) {
                       $query->where('service', 'Refill')
                             ->orWhere('service', 'Medical Consultation (Face to Face)');
+                  })
+                  ->whereHas('user', function ($query) use ($userHealthFacility) {
+                      $query->where('health_facility', $userHealthFacility); // Match health facility
                   });
-        }])->whereHas('records', function ($query) use ($currentDate) {
-            $query->whereDate('date', $currentDate); // Ensure the patient has at least one record for today
+        }])->whereHas('records', function ($query) use ($currentDate, $userHealthFacility) {
+            $query->whereDate('date', $currentDate) // Ensure the patient has at least one record for today
+                  ->whereHas('user', function ($query) use ($userHealthFacility) {
+                      $query->where('health_facility', $userHealthFacility); // Match health facility
+                  });
         });
-    
-        // Apply search filters if any search criteria are provided
-        if ($request->has('searched')) {
-            if ($request->filled('lastName')) {
-                $query->where('last_name', 'like', '%' . $request->lastName . '%');
-            }
-            if ($request->filled('firstName')) {
-                $query->where('first_name', 'like', '%' . $request->firstName . '%');
-            }
-            if ($request->filled('dob')) {
-                $query->whereDate('birthday', $request->dob);
-            }
-            if ($request->filled('middleName')) {
-                $query->where('middle_name', 'like', '%' . $request->middleName . '%');
-            }
-        }
-    
-        // Get the filtered patients
-        $patients = $query->get();
-    
-        return view('doctor.dashboard', compact('patients'));
-    }
-    
-    
-    public function findPatient(Request $request)
-    {
-        // Validate the input
-        $request->validate([
-            'lastName' => 'nullable|string|max:255',
-            'firstName' => 'nullable|string|max:255',
-            'dob' => 'nullable|date',
-            'middleName' => 'nullable|string|max:255',
-        ]);
-    
-        // Initialize the query to fetch patients
-        $query = Patient::query();
-    
-        // Build the query based on provided input
+
+    // Apply search filters if any search criteria are provided
+    if ($request->has('searched')) {
         if ($request->filled('lastName')) {
-            $query->where('last_name', 'like', '%' . $request->input('lastName') . '%');
+            $query->where('last_name', 'like', '%' . $request->lastName . '%');
         }
         if ($request->filled('firstName')) {
-            $query->where('first_name', 'like', '%' . $request->input('firstName') . '%');
+            $query->where('first_name', 'like', '%' . $request->firstName . '%');
         }
         if ($request->filled('dob')) {
-            $query->whereDate('birthday', $request->input('dob'));
+            $query->whereDate('birthday', $request->dob);
         }
-        if ($request->filled('middleName')) { 
-            $query->where('middle_name', 'like', '%' . $request->input('middleName') . '%');
+        if ($request->filled('middleName')) {
+            $query->where('middle_name', 'like', '%' . $request->middleName . '%');
         }
-    
-        // Get the results
-        $patients = $query->get();
-    
-        // Determine if no records were found
-        $noRecordsFound = $patients->isEmpty();
-    
-        if ($request->ajax()) {
-            return response()->json(['noRecordsFound' => $noRecordsFound]);
-        }
-    
-        // Return the view with the results and the flag
-        return view('doctor.dashboard', compact('patients', 'noRecordsFound'));
     }
+
+    // Get the filtered patients
+    $patients = $query->get();
+
+    return view('doctor.dashboard', compact('patients'));
+}
+
+    
+    
+public function findPatient(Request $request)
+{
+    // Validate the input
+    $request->validate([
+        'lastName' => 'nullable|string|max:255',
+        'firstName' => 'nullable|string|max:255',
+        'dob' => 'nullable|date',
+        'middleName' => 'nullable|string|max:255',
+    ]);
+
+    // Get the health facility of the currently logged-in user
+    $userHealthFacility = auth()->user()->health_facility;
+
+    // Initialize the query to fetch patients
+    $query = Patient::query();
+
+    // Build the query based on provided input
+    if ($request->filled('lastName')) {
+        $query->where('last_name', 'like', '%' . $request->input('lastName') . '%');
+    }
+    if ($request->filled('firstName')) {
+        $query->where('first_name', 'like', '%' . $request->input('firstName') . '%');
+    }
+    if ($request->filled('dob')) {
+        $query->whereDate('birthday', $request->input('dob'));
+    }
+    if ($request->filled('middleName')) {
+        $query->where('middle_name', 'like', '%' . $request->input('middleName') . '%');
+    }
+
+    // Retrieve patients and filter based on health facility association in records
+    $patients = $query->whereHas('records', function ($query) use ($userHealthFacility) {
+        $query->whereHas('user', function ($query) use ($userHealthFacility) {
+            $query->where('health_facility', $userHealthFacility);
+        });
+    })->get();
+
+    // Determine if no records were found
+    $noRecordsFound = $patients->isEmpty();
+
+    // If the request is AJAX, return JSON response
+    if ($request->ajax()) {
+        return response()->json(['noRecordsFound' => $noRecordsFound]);
+    }
+
+    // Return the view with the filtered patients and the flag
+    return view('doctor.dashboard', compact('patients', 'noRecordsFound'));
+}
+
 
     public function selectPatient(Request $request)
 {
@@ -305,50 +325,83 @@ public function removePrescription($id)
 
 public function allPatients()
 {
-    $patients = Patient::all();
-    return view('doctor.records', compact('patients'));
+      // Get the health facility of the currently logged-in user
+      $userHealthFacility = auth()->user()->health_facility;
+    
+      // Initialize an empty collection to store eligible patients
+      $eligiblePatients = collect();
+  
+      // Retrieve all patients
+      $patients = Patient::all();
+  
+      foreach ($patients as $patient) {
+          // Find a single record associated with the patient_id in the records table
+          $record = Record::where('patient_id', $patient->id)->first();
+  
+          if ($record) {
+              // Retrieve the user associated with this record
+              $recordUser = User::find($record->user_id);
+  
+              // Check if the health facility of this user matches the logged-in user's health facility
+              if ($recordUser && $recordUser->health_facility === $userHealthFacility) {
+                  $eligiblePatients->push($patient); // Add the patient to the eligible list
+              }
+          }
+      }
+  
+      // Pass only eligible patients to the view
+      return view('doctor.records', ['patients' => $eligiblePatients]);
 }
 
 public function recordfindPatient(Request $request)
-    {
-        // Validate the input
-        $request->validate([
-            'lastName' => 'nullable|string|max:255',
-            'firstName' => 'nullable|string|max:255',
-            'dob' => 'nullable|date',
-            'middleName' => 'nullable|string|max:255',
-        ]);
-    
-        // Initialize the query to fetch patients
-        $query = Patient::query();
-    
-        // Build the query based on provided input
-        if ($request->filled('lastName')) {
-            $query->where('last_name', 'like', '%' . $request->input('lastName') . '%');
-        }
-        if ($request->filled('firstName')) {
-            $query->where('first_name', 'like', '%' . $request->input('firstName') . '%');
-        }
-        if ($request->filled('dob')) {
-            $query->whereDate('birthday', $request->input('dob'));
-        }
-        if ($request->filled('middleName')) { 
-            $query->where('middle_name', 'like', '%' . $request->input('middleName') . '%');
-        }
-    
-        // Get the results
-        $patients = $query->get();
-    
-        // Determine if no records were found
-        $noRecordsFound = $patients->isEmpty();
-    
-        if ($request->ajax()) {
-            return response()->json(['noRecordsFound' => $noRecordsFound]);
-        }
-    
-        // Return the view with the results and the flag
-        return view('doctor.records', compact('patients', 'noRecordsFound'));
+{
+    // Validate the input
+    $request->validate([
+        'lastName' => 'nullable|string|max:255',
+        'firstName' => 'nullable|string|max:255',
+        'dob' => 'nullable|date',
+        'middleName' => 'nullable|string|max:255',
+    ]);
+
+    // Get the health facility of the currently logged-in user
+    $userHealthFacility = auth()->user()->health_facility;
+
+    // Initialize the query to fetch patients with filtering conditions
+    $query = Patient::query();
+
+    // Apply search filters if provided
+    if ($request->filled('lastName')) {
+        $query->where('last_name', 'like', '%' . $request->input('lastName') . '%');
     }
+    if ($request->filled('firstName')) {
+        $query->where('first_name', 'like', '%' . $request->input('firstName') . '%');
+    }
+    if ($request->filled('dob')) {
+        $query->whereDate('birthday', $request->input('dob'));
+    }
+    if ($request->filled('middleName')) {
+        $query->where('middle_name', 'like', '%' . $request->input('middleName') . '%');
+    }
+
+    // Retrieve patients and filter based on health facility association in records
+    $patients = $query->whereHas('records', function ($query) use ($userHealthFacility) {
+        $query->whereHas('user', function ($query) use ($userHealthFacility) {
+            $query->where('health_facility', $userHealthFacility);
+        });
+    })->get();
+
+    // Determine if no records were found
+    $noRecordsFound = $patients->isEmpty();
+
+    // Return JSON response if the request is AJAX
+    if ($request->ajax()) {
+        return response()->json(['noRecordsFound' => $noRecordsFound]);
+    }
+
+    // Return the view with the filtered patients and the flag
+    return view('doctor.records', compact('patients', 'noRecordsFound'));
+}
+
 
     public function viewPatientRecord($id)
     {

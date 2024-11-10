@@ -281,6 +281,12 @@
                         Account List
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('admin.reports') }}" class="{{ request()->routeIs('admin.reports') ? 'active' : '' }}">
+                        <img src="{{ asset('reports.png') }}" alt="Reports Icon">
+                        Reports
+                    </a>
+                </li>
                 <!-- Add more sidebar links here -->
             </ul>
         </div>

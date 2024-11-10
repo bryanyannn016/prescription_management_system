@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\Diagnosis;
+use App\Models\Prescription;
+use App\Models\Record;
+use App\Models\Patient;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -65,7 +70,7 @@ class AdminController extends Controller
             'health_facility' => $healthFacilityName, // Store the display name
         ]);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Account created successfully.');
+        return redirect()->route('admin.account-list')->with('success', 'Account created successfully.');
     }
 
     public function accountList(Request $request)
@@ -124,6 +129,167 @@ public function updateStatus($id)
     
     return redirect()->route('admin.account-list')->with('success', 'User status updated to Inactive');
 }
+
+public function reports(Request $request)
+{
+    // Get the filters from the request
+    $monthDiagnosis = $request->input('month_diagnosis');
+    $yearDiagnosis = $request->input('year_diagnosis');
+
+    $monthPrescription = $request->input('month_prescription');
+    $yearPrescription = $request->input('year_prescription');
+
+     // Get the filters from the request
+     $monthAgeGroup = $request->input('month_agegroup');
+     $yearAgeGroup = $request->input('year_agegroup');
+     $medicationAgeGroup = $request->input('medication_agegroup');
+    
+
+    // Fetch the top 10 diagnoses
+    $diagnoses = $this->getTopDiagnoses($monthDiagnosis, $yearDiagnosis);
+
+    // Fetch the top 10 prescriptions
+    $prescriptions = $this->getTopPrescriptions($monthPrescription, $yearPrescription);
+
+    // Fetch distinct months and years for the filters
+    $months = Diagnosis::selectRaw('MONTH(created_at) as month')->distinct()->pluck('month');
+    $years = Diagnosis::selectRaw('YEAR(created_at) as year')->distinct()->pluck('year');
+    
+
+    // Fetch all medications for the medication filter dropdown
+    $medications = Prescription::distinct()->pluck('medication');
+    
+     
+    // Fetch drug utilization per age group if a medication is selected
+    $ageGroupData = [];
+    if ($medicationAgeGroup) {
+        $ageGroupData = $this->getDrugUtilizationByAgeGroup($monthAgeGroup, $yearAgeGroup, $medicationAgeGroup);
+    }
+
+    // Pass the correct variable name 'ageGroupData' to the view
+    return view('admin.dashboard', compact('diagnoses', 'prescriptions', 'months', 'years', 'medications', 'ageGroupData'));
+}
+
+
+public function getDrugUtilizationByAgeGroup($month = null, $year = null, $medication = null)
+{
+    // Initialize the age group data
+    $ageGroups = ['<18', '18-59', '60-69', '>70'];
+    $ageGroupData = array_fill_keys($ageGroups, 0);
+
+    // Build the query to fetch prescriptions based on medication and optional month/year filter
+    $query = Prescription::where('medication', $medication);
+
+    // Apply month and year filters
+    if ($month && $month !== 'all') {
+        $query->whereMonth('last_prescribed', $month);
+    }
+
+    if ($year && $year !== 'all') {
+        $query->whereYear('last_prescribed', $year);
+    }
+
+    // Fetch the prescriptions based on the filters
+    $prescriptions = $query->get();
+
+    // Use a set to track unique patient IDs already counted
+    $countedPatients = [];
+
+    // Iterate over the prescriptions to classify patients by age
+    foreach ($prescriptions as $prescription) {
+        // Get the record associated with the prescription
+        $record = Record::where('id', $prescription->record_id)->first();
+
+        // Get the patient associated with the record
+        $patient = Patient::where('id', $record->patient_id)->first();
+
+        // Check if the patient has already been counted for this medication
+        if ($patient && !in_array($patient->id, $countedPatients)) {
+            // Add patient ID to the counted set
+            $countedPatients[] = $patient->id;
+
+            // Classify by age group
+            $age = $patient->age;
+            if ($age < 18) {
+                $ageGroupData['<18']++;
+            } elseif ($age >= 18 && $age <= 59) {
+                $ageGroupData['18-59']++;
+            } elseif ($age >= 60 && $age <= 69) {
+                $ageGroupData['60-69']++;
+            } else {
+                $ageGroupData['>70']++;
+            }
+        }
+    }
+
+    return $ageGroupData;
+}
+
+
+
+public function getTopDiagnoses($month = null, $year = null)
+{
+    // Build the query to get diagnoses count, grouped by 'diagnosis'
+    $queryDiagnoses = Diagnosis::select('diagnosis', DB::raw('COUNT(*) as count'))
+        ->groupBy('diagnosis');
+    
+    // Apply month and year filters for diagnoses if provided
+    if ($month && $month !== 'all') {
+        $queryDiagnoses->whereMonth('created_at', $month);
+    }
+    
+    if ($year && $year !== 'all') {
+        $queryDiagnoses->whereYear('created_at', $year);
+    }
+
+    // Get the diagnoses data, sorted by count, limited to top 10
+    $diagnoses = $queryDiagnoses->orderByDesc('count')
+        ->limit(10) // Limit to the top 10 diagnoses
+        ->get();
+
+    // Fill missing diagnoses with placeholder values
+    $missingDiagnosesCount = 10 - $diagnoses->count();
+    for ($i = 0; $i < $missingDiagnosesCount; $i++) {
+        $diagnoses->push((object) ['diagnosis' => 'N/A', 'count' => 0]);
+    }
+
+    return $diagnoses;
+}
+
+public function getTopPrescriptions($month = null, $year = null)
+{
+    // Fetch the top 10 prescriptions with optional filters
+    $queryPrescriptions = Prescription::select('medication', DB::raw('SUM(quantity) as total_quantity'))
+        ->groupBy('medication');
+
+    // Apply month and year filters for prescriptions if provided
+    if ($month && $month !== 'all') {
+        $queryPrescriptions->whereMonth('last_prescribed', $month);
+    }
+
+    if ($year && $year !== 'all') {
+        $queryPrescriptions->whereYear('last_prescribed', $year);
+    }
+
+    // Get the prescriptions data, sorted by total_quantity, limited to top 10
+    $prescriptions = $queryPrescriptions->orderByDesc('total_quantity')
+        ->limit(10) // Limit to the top 10 prescriptions
+        ->get();
+
+    // Fill missing prescriptions with placeholder values
+    $missingPrescriptionsCount = 10 - $prescriptions->count();
+    for ($i = 0; $i < $missingPrescriptionsCount; $i++) {
+        $prescriptions->push((object) ['medication' => 'N/A', 'total_quantity' => 0]);
+    }
+
+    return $prescriptions;
+}
+
+
+
+
+
+
 
 
 }

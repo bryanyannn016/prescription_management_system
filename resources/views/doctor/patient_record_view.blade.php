@@ -82,18 +82,6 @@
                 <p>No prescriptions found for this record.</p>
             @endif
         </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-md-6 text-end custom-margin-right">
-            <p><strong class="label-color">Barangay:</strong> {{ $patient->barangay }}</p>
-        </div>
-        <div class="col-md-6 text-end">
-            <p><strong class="label-color">Service:</strong> {{ $record->service }}</p>
-        </div>
-        <div class="col-md-6 text-end">
-            <p><strong class="label-color">Date:</strong> {{ $record->date }}</p>
-        </div>
 
         <!-- Files Table -->
         <div class="mt-4">
@@ -110,7 +98,9 @@
                         <tr>
                             <td>{{ $file->file_path }}</td>
                             <td>
-                                <a href="{{ route('files.view', $file->id) }}" class="btn btn-primary btn-sm">View</a>
+                                <a href="{{ route('files.view', $file->id) }}" class="btn btn-link btn-sm">
+                                    <img src="{{ asset('view.png') }}" alt="View" style="width: 25px; height: 25px;"/>
+                                </a>
                             </td>
                         </tr>
                     @endforeach
@@ -121,6 +111,20 @@
                 <p>No files found for this record.</p>
             @endif
         </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6 text-end custom-margin-right">
+            <p><strong class="label-color">Barangay:</strong> {{ $patient->barangay }}</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <p><strong class="label-color">Service:</strong> {{ $record->service }}</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <p><strong class="label-color">Date:</strong> {{ $record->date }}</p>
+        </div>
+
+        
     </div>
 </div>
 

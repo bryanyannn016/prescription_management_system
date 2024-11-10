@@ -169,7 +169,7 @@
 
 @if((!isset($admitPatientDetails) || $admitPatientDetails->count() === 0) && 
     (!isset($refillPatientDetails) || $refillPatientDetails->count() === 0) && request()->input('searched'))
-    <div class="alert alert-warning mt-3" role="alert">
+    <div class="alert alert-warning mt-3" role="alert" style="margin-top:20px;">
         No patient found.
     </div>
 @endif

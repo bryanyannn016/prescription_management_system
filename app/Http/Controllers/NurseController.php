@@ -7,6 +7,7 @@ use App\Models\Patient;
 use App\Models\Record; 
 use App\Models\File; 
 use App\Models\Diagnosis; 
+use App\Models\User; 
 use App\Models\Prescription; 
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log; 
@@ -18,9 +19,34 @@ class NurseController extends Controller
 {
     public function index()
     {
+        // Get the health facility of the currently logged-in user
+        $userHealthFacility = auth()->user()->health_facility;
+    
+        // Initialize an empty collection to store eligible patients
+        $eligiblePatients = collect();
+    
+        // Retrieve all patients
         $patients = Patient::all();
-        return view('nurse.dashboard', compact('patients'));
+    
+        foreach ($patients as $patient) {
+            // Find a single record associated with the patient_id in the records table
+            $record = Record::where('patient_id', $patient->id)->first();
+    
+            if ($record) {
+                // Retrieve the user associated with this record
+                $recordUser = User::find($record->user_id);
+    
+                // Check if the health facility of this user matches the logged-in user's health facility
+                if ($recordUser && $recordUser->health_facility === $userHealthFacility) {
+                    $eligiblePatients->push($patient); // Add the patient to the eligible list
+                }
+            }
+        }
+    
+        // Pass only eligible patients to the view
+        return view('nurse.dashboard', ['patients' => $eligiblePatients]);
     }
+    
 
     public function createPatient()
     {
@@ -118,6 +144,7 @@ class NurseController extends Controller
     $record->service = $request->input('service'); // Use the service from the request
     $record->status = $request->input('service') === 'Medical Consultation (Face to Face)' ? 'Approved' : 'Pending'; // Determine status
     $record->date = now(); // Set current date
+    $record->user_id = auth()->id(); 
     $record->save(); // Save the record
 
     // Handle file uploads
@@ -148,41 +175,50 @@ class NurseController extends Controller
     public function findPatient(Request $request)
     {
         // Validate the input
-        $request->validate([
-            'lastName' => 'nullable|string|max:255',
-            'firstName' => 'nullable|string|max:255',
-            'dob' => 'nullable|date',
-            'middleName' => 'nullable|string|max:255',
-        ]);
+    $request->validate([
+        'lastName' => 'nullable|string|max:255',
+        'firstName' => 'nullable|string|max:255',
+        'dob' => 'nullable|date',
+        'middleName' => 'nullable|string|max:255',
+    ]);
 
-        // Query the patients table
-        $query = Patient::query();
+    // Get the health facility of the currently logged-in user
+    $userHealthFacility = auth()->user()->health_facility;
 
-        if ($request->filled('lastName')) {
-            $query->where('last_name', 'like', '%' . $request->input('lastName') . '%');
-        }
-        if ($request->filled('firstName')) {
-            $query->where('first_name', 'like', '%' . $request->input('firstName') . '%');
-        }
-        if ($request->filled('dob')) {
-            $query->whereDate('birthday', $request->input('dob'));
-        }
-        if ($request->filled('middleName')) { 
-            $query->where('middle_name', 'like', '%' . $request->input('middleName') . '%');
-        }
+    // Initialize the query to fetch patients with filtering conditions
+    $query = Patient::query();
 
-        // Get the results
-        $patients = $query->get();
+    // Apply search filters if provided
+    if ($request->filled('lastName')) {
+        $query->where('last_name', 'like', '%' . $request->input('lastName') . '%');
+    }
+    if ($request->filled('firstName')) {
+        $query->where('first_name', 'like', '%' . $request->input('firstName') . '%');
+    }
+    if ($request->filled('dob')) {
+        $query->whereDate('birthday', $request->input('dob'));
+    }
+    if ($request->filled('middleName')) {
+        $query->where('middle_name', 'like', '%' . $request->input('middleName') . '%');
+    }
 
-        // Determine if no records were found
-        $noRecordsFound = $patients->isEmpty();
+    // Retrieve patients and filter based on health facility association in records
+    $patients = $query->whereHas('records', function ($query) use ($userHealthFacility) {
+        $query->whereHas('user', function ($query) use ($userHealthFacility) {
+            $query->where('health_facility', $userHealthFacility);
+        });
+    })->get();
 
-        if ($request->ajax()) {
-            return response()->json(['noRecordsFound' => $noRecordsFound]);
-        }
+    // Determine if no records were found
+    $noRecordsFound = $patients->isEmpty();
 
-        // Return the view with the results and the flag
-        return view('nurse.dashboard', compact('patients', 'noRecordsFound'));
+    // Return JSON response if the request is AJAX
+    if ($request->ajax()) {
+        return response()->json(['noRecordsFound' => $noRecordsFound]);
+    }
+
+    // Return the view with the filtered patients and the flag
+    return view('nurse.dashboard', compact('patients', 'noRecordsFound'));
     }
 
 
@@ -264,8 +300,7 @@ public function storeExistingPatient(Request $request)
     $record->service = $request->input('service'); // Use the service from the request
     $record->status = $request->input('service') === 'Medical Consultation (Face to Face)' ? 'Approved' : 'Pending'; // Determine status
     $record->date = now(); // Set current date
-    $record->prescription_id = null; // Set to null for now
-    $record->final_diagnosis = json_encode([]); // Initialize as empty JSON array for diagnosis
+    $record->user_id = auth()->id(); 
     $record->save(); // Save the record
 
     // Handle file uploads
@@ -334,9 +369,15 @@ public function prescriptionList()
     // Get today's date
     $today = now()->format('Y-m-d');
 
+    // Get the health facility of the currently logged-in user
+    $userHealthFacility = auth()->user()->health_facility;
+
     // Get admitted patients for 'Refill' from the records table
     $admitPatients = Record::where('service', 'Refill')
         ->where('date', $today)
+        ->whereHas('user', function ($query) use ($userHealthFacility) {
+            $query->where('health_facility', $userHealthFacility);
+        })
         ->get(['id', 'patient_id']); // Get both record_id and patient_id
 
     // Get refill patients from the prescription table with today's refill date
@@ -351,6 +392,14 @@ public function prescriptionList()
             return Record::where('patient_id', $patientId)
                 ->where('service', 'Refill')
                 ->where('date', $today)
+                ->exists();
+        })
+        ->filter(function ($patientId) use ($userHealthFacility) {
+            // Check if the patient is associated with the same health facility as the logged-in user
+            return Record::where('patient_id', $patientId)
+                ->whereHas('user', function ($query) use ($userHealthFacility) {
+                    $query->where('health_facility', $userHealthFacility);
+                })
                 ->exists();
         });
 
@@ -373,34 +422,111 @@ public function prescriptionList()
 
 public function findRefillPatient(Request $request)
 {
-    // Prepare query to filter patients with service 'Refill'
-    $refillRecords = Record::where('service', 'Refill');
+    // Validate the input
+    $request->validate([
+        'lastName' => 'nullable|string|max:255',
+        'firstName' => 'nullable|string|max:255',
+        'dob' => 'nullable|date',
+        'middleName' => 'nullable|string|max:255',
+    ]);
 
-    // Prepare a base query to find patients
-    $query = Patient::query();
+    // Get today's date
+    $today = now()->format('Y-m-d');
 
-    // Apply filters based on input
-    if ($request->has('lastName') && $request->lastName != '') {
-        $query->where('last_name', 'LIKE', '%' . $request->lastName . '%');
+    // Get the health facility of the currently logged-in user
+    $userHealthFacility = auth()->user()->health_facility;
+
+    // Initialize queries for admitPatients and refillPatients
+    $admitPatientsQuery = Record::where('service', 'Refill')
+        ->where('date', $today)
+        ->whereHas('user', function ($query) use ($userHealthFacility) {
+            $query->where('health_facility', $userHealthFacility);
+        });
+
+    $refillPatientsQuery = Prescription::where('refill_date', $today)
+        ->pluck('record_id')
+        ->map(function ($recordId) {
+            return Record::where('id', $recordId)->pluck('patient_id')->first();
+        })
+        ->unique()
+        // Exclude patients already admitted for 'Refill' today
+        ->reject(function ($patientId) use ($today) {
+            return Record::where('patient_id', $patientId)
+                ->where('service', 'Refill')
+                ->where('date', $today)
+                ->exists();
+        })
+        ->filter(function ($patientId) use ($userHealthFacility) {
+            return Record::where('patient_id', $patientId)
+                ->whereHas('user', function ($query) use ($userHealthFacility) {
+                    $query->where('health_facility', $userHealthFacility);
+                })
+                ->exists();
+        });
+
+    // Apply filters if search parameters are provided
+    if ($request->filled('lastName')) {
+        $admitPatientsQuery->whereHas('patient', function ($query) use ($request) {
+            $query->where('last_name', 'like', '%' . $request->input('lastName') . '%');
+        });
+        $refillPatientsQuery = $refillPatientsQuery->filter(function ($patientId) use ($request) {
+            return Patient::where('id', $patientId)
+                ->where('last_name', 'like', '%' . $request->input('lastName') . '%')
+                ->exists();
+        });
     }
-    if ($request->has('firstName') && $request->firstName != '') {
-        $query->where('first_name', 'LIKE', '%' . $request->firstName . '%');
-    }
-    if ($request->has('dob') && $request->dob != '') {
-        $query->whereDate('dob', $request->dob);
-    }
-    if ($request->has('middleName') && $request->middleName != '') {
-        $query->where('middle_name', 'LIKE', '%' . $request->middleName . '%');
+
+    if ($request->filled('firstName')) {
+        $admitPatientsQuery->whereHas('patient', function ($query) use ($request) {
+            $query->where('first_name', 'like', '%' . $request->input('firstName') . '%');
+        });
+        $refillPatientsQuery = $refillPatientsQuery->filter(function ($patientId) use ($request) {
+            return Patient::where('id', $patientId)
+                ->where('first_name', 'like', '%' . $request->input('firstName') . '%')
+                ->exists();
+        });
     }
 
-    // Get patient IDs related to refill records
-    $patientIds = $refillRecords->pluck('patient_id')->intersect($query->pluck('id'));
+    if ($request->filled('dob')) {
+        $admitPatientsQuery->whereHas('patient', function ($query) use ($request) {
+            $query->whereDate('birthday', $request->input('dob'));
+        });
+        $refillPatientsQuery = $refillPatientsQuery->filter(function ($patientId) use ($request) {
+            return Patient::where('id', $patientId)
+                ->whereDate('birthday', $request->input('dob'))
+                ->exists();
+        });
+    }
 
-    // Fetch the filtered patients
-    $patients = $query->whereIn('id', $patientIds)->get();
+    if ($request->filled('middleName')) {
+        $admitPatientsQuery->whereHas('patient', function ($query) use ($request) {
+            $query->where('middle_name', 'like', '%' . $request->input('middleName') . '%');
+        });
+        $refillPatientsQuery = $refillPatientsQuery->filter(function ($patientId) use ($request) {
+            return Patient::where('id', $patientId)
+                ->where('middle_name', 'like', '%' . $request->input('middleName') . '%')
+                ->exists();
+        });
+    }
 
-    return view('nurse.prescription_list', compact('patients'));
+    // Get the admitPatients and refillPatients after filtering
+    $admitPatients = $admitPatientsQuery->get(['id', 'patient_id']);
+    $refillPatients = $refillPatientsQuery->values(); // Re-index after filtering
+
+    // Retrieve patient details for admitted and refill patients
+    $admitPatientDetails = Patient::whereIn('id', $admitPatients->pluck('patient_id'))->get();
+    $refillPatientDetails = Patient::whereIn('id', $refillPatients)->get();
+
+    // Check for each admitted patient's record_id in the prescriptions table
+    $admitPatientRecords = $admitPatients->map(function ($record) {
+        $record->has_prescription = Prescription::where('record_id', $record->id)->exists();
+        return $record;
+    });
+
+    // Pass all required data to the view
+    return view('nurse.prescription_list', compact('admitPatientDetails', 'refillPatientDetails', 'admitPatientRecords'));
 }
+
 
 public function deferPatient(Request $request)
 {
@@ -526,8 +652,15 @@ public function storeRefill(Request $request)
 
 public function patient_list()
 {
-    // Retrieve all records with 'service' and 'status' columns
-    $records = Record::select('id', 'service', 'status', 'patient_id', 'created_at')->get();
+    // Get the health facility of the currently authenticated user
+    $userHealthFacility = auth()->user()->health_facility;
+
+    // Retrieve all records where the associated user's health facility matches the auth user's
+    $records = Record::whereHas('user', function($query) use ($userHealthFacility) {
+            $query->where('health_facility', $userHealthFacility);
+        })
+        ->select('id', 'service', 'status', 'patient_id', 'created_at', 'user_id')
+        ->get();
 
     // Loop through records to add patient information based on patient_id
     foreach ($records as $record) {
@@ -535,9 +668,10 @@ public function patient_list()
         $record->patient = Patient::where('id', $record->patient_id)->first();
     }
 
-    // Pass the records to the view
+    // Pass the filtered records to the view
     return view('nurse.patient_list', ['records' => $records]);
 }
+
 
 public function findPatientRecord(Request $request)
 {
@@ -549,7 +683,10 @@ public function findPatientRecord(Request $request)
         'middleName' => 'nullable|string|max:255',
     ]);
 
-    // Initialize the query for Record model
+    // Get the health facility of the currently logged-in user
+    $userHealthFacility = auth()->user()->health_facility;
+
+    // Initialize the query for the Record model
     $query = Record::query();
 
     // Check if the last name is filled and apply the filter
@@ -580,6 +717,11 @@ public function findPatientRecord(Request $request)
         });
     }
 
+    // Apply the filter for health facility matching between the record's user and the logged-in user
+    $query->whereHas('user', function ($q) use ($userHealthFacility) {
+        $q->where('health_facility', $userHealthFacility);
+    });
+
     // Get the results
     $records = $query->get();
 
@@ -589,6 +731,7 @@ public function findPatientRecord(Request $request)
     // Pass the records and noRecordsFound flag to the view
     return view('nurse.patient_list', compact('records', 'noRecordsFound'));
 }
+
 
 
 

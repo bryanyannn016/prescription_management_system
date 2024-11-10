@@ -102,7 +102,9 @@
                         <tr>
                             <td class="table-data">{{ basename($file->file_path) }}</td> <!-- Show just the filename -->
                             <td class="table-data">
-                                <a href="{{ route('files.view', $file->id) }}" class="btn btn-info">View</a>
+                                <a href="{{ route('files.view', $file->id) }}" class="btn btn-link btn-sm">
+                                    <img src="{{ asset('view.png') }}" alt="View" style="width: 25px; height: 25px;"/>
+                                </a>
                             </td>
                         </tr>
                     @endforeach

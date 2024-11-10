@@ -50,7 +50,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($patients as $patient)
+            @forelse($patients as $patient)
                 <tr>
                     <td>{{ $patient->last_name }}</td>
                     <td>{{ $patient->first_name }}</td>
@@ -64,7 +64,11 @@
                         </form>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="7" class="text-center">No records found</td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 </div>

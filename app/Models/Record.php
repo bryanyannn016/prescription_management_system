@@ -11,6 +11,7 @@ class Record extends Model
 
     protected $fillable = [
         'patient_id',
+        'user_id',
         'service',
         'status',
         'date',
@@ -37,6 +38,11 @@ public function prescriptions()
 public function patient()
 {
     return $this->belongsTo(Patient::class);
+}
+
+public function user()
+{
+    return $this->belongsTo(User::class);
 }
     
 }

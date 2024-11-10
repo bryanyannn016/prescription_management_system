@@ -54,7 +54,7 @@
             <tbody>
                 @foreach($patients as $patient)
                     @foreach($patient->records as $record)
-                        @if($record->service == 'Refill' || $record->service == 'Medical Consultation (Face to Face)')
+                        @if(($record->service == 'Refill' && \App\Models\Prescription::where('record_id', $record->id)->exists()) || $record->service == 'Medical Consultation (Face to Face)')
                             <tr>
                                 <td>{{ $patient->last_name }}</td>
                                 <td>{{ $patient->first_name }}</td>

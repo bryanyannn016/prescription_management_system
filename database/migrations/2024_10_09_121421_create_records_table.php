@@ -10,6 +10,7 @@ class CreateRecordsTable extends Migration
     {
         Schema::create('records', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('patient_id')->constrained()->onDelete('cascade'); // Assuming patient_id references the patients table
             $table->string('service');
             $table->string('status')->default('Pending'); // Default status to Pending
