@@ -19,14 +19,13 @@
         color: #000; /* Optional: Set the text color to black for better contrast */
     }
     .remove-btn {
-        color: red; /* Set the color for the remove button */
-        cursor: pointer; /* Change cursor to pointer for better UX */
-        border: none; /* Remove default border */
-        background-color: transparent; /* Make background transparent */
-        padding: 0; /* Remove padding */
-        text-decoration: underline; /* Underline the text for emphasis */
-        margin-left: 30px;
-    }
+    color: red; /* Text color */
+    cursor: pointer; /* Change cursor to pointer for better UX */
+    background-color: transparent; /* Background transparent */
+    border: none; /* Remove border */
+    font-weight: bold; /* Optional: Bold text */
+}
+
     .ongoing-checkbox {
         margin-right: 10px;
     }
@@ -132,9 +131,9 @@
                 <td class="table-data">
                     <input type="checkbox" class="ongoing-checkbox" checked>
                 </td>
-                <td class="table-data">
-                    <button class="remove-btn" onclick="removeDiagnosis(this)">Remove</button>
-                </td>
+                            <td class="table-data">
+                <button type="button" class="btn remove-btn" onclick="removeDiagnosis(this)">Remove</button>
+            </td>
             `;
 
             // Append the new row to the diagnosis list

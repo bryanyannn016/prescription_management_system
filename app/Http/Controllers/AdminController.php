@@ -286,6 +286,94 @@ public function getTopPrescriptions($month = null, $year = null)
 }
 
 
+public function patientList(Request $request)
+{
+    // Fetch all health facilities from the users table for the dropdown
+    $healthFacilities = DB::table('users')->pluck('health_facility')->unique();
+
+    // Default query to get all records with service and date
+    $query = DB::table('records')
+        ->join('patients', 'records.patient_id', '=', 'patients.id')
+        ->join('users', 'records.user_id', '=', 'users.id')
+        ->select('records.service', 'records.date', 'patients.first_name', 'patients.middle_name', 'patients.last_name', 'users.health_facility');
+
+    // Apply filters if they are provided
+    if ($request->has('health_facility') && $request->health_facility != '') {
+        $query->where('users.health_facility', $request->health_facility);
+    }
+
+    if ($request->has('month') && !empty($request->month)) {
+        // Filter by selected months
+        $query->whereIn(DB::raw('MONTH(records.date)'), $request->month);
+    }
+
+    if ($request->has('year') && $request->year != '') {
+        // Filter by selected year
+        $query->whereYear('records.date', $request->year);
+    }
+
+    // Search functionality: check if a search term is provided
+    if ($request->has('search') && $request->search != '') {
+        // Search by first_name, middle_name, or last_name (you can adjust this to search other fields as well)
+        $searchTerm = $request->search;
+        $query->where(function($q) use ($searchTerm) {
+            $q->where('patients.first_name', 'LIKE', "%$searchTerm%")
+              ->orWhere('patients.middle_name', 'LIKE', "%$searchTerm%")
+              ->orWhere('patients.last_name', 'LIKE', "%$searchTerm%");
+        });
+    }
+
+    // Fetch the filtered records
+    $records = $query->get();
+
+    // Fetch available years for the dropdown
+    $years = DB::table('records')->select(DB::raw('YEAR(date) as year'))->distinct()->pluck('year');
+
+    return view('admin.patient_list', compact('records', 'healthFacilities', 'years'));
+}
+
+
+
+public function prescriptionList(Request $request)
+{
+    // Fetch all health facilities and unique years for the dropdowns
+    $healthFacilities = DB::table('users')->pluck('health_facility')->unique();
+    $years = DB::table('prescriptions')
+        ->select(DB::raw('YEAR(refill_date) as year'))
+        ->distinct()
+        ->pluck('year');
+
+    // Query to get medication and total quantity prescribed
+    $query = DB::table('prescriptions')
+        ->join('records', 'prescriptions.record_id', '=', 'records.id')
+        ->join('users', 'records.user_id', '=', 'users.id')
+        ->select('prescriptions.medication', DB::raw('SUM(prescriptions.quantity) as total_prescribed'))
+        ->groupBy('prescriptions.medication');
+
+    // Apply filters
+    if ($request->filled('health_facility')) {
+        $query->where('users.health_facility', $request->health_facility);
+    }
+
+    if ($request->filled('month')) {
+        $query->whereIn(DB::raw('MONTH(prescriptions.refill_date)'), $request->month);
+    }
+
+    if ($request->filled('year')) {
+        $query->whereYear('prescriptions.refill_date', $request->year);
+    }
+
+    // Apply search functionality
+    if ($request->filled('search')) {
+        $query->where('prescriptions.medication', 'like', '%' . $request->search . '%');
+    }
+
+    // Execute query
+    $prescriptions = $query->get();
+
+    // Return view with data
+    return view('admin.prescription_list', compact('prescriptions', 'healthFacilities', 'years'));
+}
 
 
 

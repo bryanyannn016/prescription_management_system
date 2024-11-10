@@ -11,13 +11,14 @@
         color: #000; /* Set the text color to black for better contrast */
     }
     .remove-btn {
-        color: red; /* Set the color for the remove button */
-        cursor: pointer; /* Change cursor to pointer for better UX */
-        border: none; /* Remove default border */
-        background-color: transparent; /* Make background transparent */
-        padding: 0; /* Remove padding */
-        text-decoration: underline; /* Underline the text for emphasis */
-    }
+    color: red; /* Text color */
+    cursor: pointer; /* Change cursor to pointer for better UX */
+    background-color: transparent; /* Background transparent */
+    border: none; /* Remove border */
+    font-weight: bold; /* Optional: Bold text */
+    
+}
+
     .refill-date-container {
         display: none; /* Initially hide the refill date input */
         margin-top: 20px; /* Add some margin for spacing */

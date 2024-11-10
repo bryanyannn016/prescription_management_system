@@ -3,6 +3,16 @@
 <head>
     <title>@yield('title') - Admin</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"> <!-- Include Inter font -->
+    <!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- jQuery (required for Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+
     <!-- Add this in the head section of your layout file -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
@@ -153,8 +163,8 @@
             background-color: #0056b3;
         }
         .custom-form-margin {
-    margin-left: 40px; /* Adjust as needed */
-    margin-top: 50px; /* Adjust as needed */
+    margin-left: 20px; /* Adjust as needed */
+    margin-top: 40px; /* Adjust as needed */
 }
 
 .custom-label {
@@ -285,6 +295,18 @@
                     <a href="{{ route('admin.reports') }}" class="{{ request()->routeIs('admin.reports') ? 'active' : '' }}">
                         <img src="{{ asset('reports.png') }}" alt="Reports Icon">
                         Reports
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.patient-list') }}" class="{{ request()->routeIs('admin.patient-list') ? 'active' : '' }}">
+                        <img src="{{ asset('patient-list.png') }}" alt="Patient List Icon">
+                        Record List
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.prescription-list') }}" class="{{ request()->routeIs('admin.prescription-list') ? 'active' : '' }}">
+                        <img src="{{ asset('prescription.png') }}" alt="Prescription List Icon">
+                        Prescription List
                     </a>
                 </li>
                 <!-- Add more sidebar links here -->

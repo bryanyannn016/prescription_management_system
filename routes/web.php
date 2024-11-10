@@ -34,7 +34,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/account/{id}/edit', [AdminController::class, 'editAccount'])->name(name: 'admin.edit-account');
     Route::post('/admin/user/update/{id}', [AdminController::class, 'update'])->name('admin.update');
     Route::patch('/admin/update-status/{id}', [AdminController::class, 'updateStatus'])->name('admin.update-status');
-    //Route::get('/admin/reports', [AdminController::class, 'reports'])->name('admin.reports');
+    Route::get('/admin/patient-list', [AdminController::class, 'patientList'])->name('admin.patient-list');
+    Route::get('/admin/prescription-list', [AdminController::class, 'prescriptionList'])->name('admin.prescription-list');
+
 
 });
 
