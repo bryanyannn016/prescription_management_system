@@ -10,6 +10,7 @@ use App\Models\Prescription;
 use App\Models\Record;
 use App\Models\Patient;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -65,7 +66,7 @@ class AdminController extends Controller
             'middle_name' => $request->input('middle_name'),
             'last_name' => $request->input('last_name'),
             'email' => $request->input('email'),
-            'password' => \Illuminate\Support\Facades\Hash::make('defaultpassword'), // You can set a default password or generate one
+            'password' => Hash::make('defaultpassword'), // You can set a default password or generate one
             'type' => $request->input('type'),
             'health_facility' => $healthFacilityName, // Store the display name
         ]);
@@ -376,6 +377,18 @@ public function prescriptionList(Request $request)
 }
 
 
+public function resetPassword($id)
+{
+    // Fetch the user by ID
+    $user = User::findOrFail($id);
+
+    // Reset the password to 'defaultpassword'
+    $user->password = Hash::make('defaultpassword');
+    $user->save();
+
+    // Redirect back with a success message
+    return redirect()->route('admin.account-list')->with('success', 'Password has been reset to the default password.');
+}
 
 
 

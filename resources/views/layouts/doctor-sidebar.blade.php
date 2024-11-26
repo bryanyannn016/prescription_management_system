@@ -99,7 +99,7 @@
     }
 
     .sidebar ul li {
-        margin-bottom: 10px;
+       
         display: flex;
         align-items: center;
         justify-content: flex-start;
@@ -210,17 +210,24 @@
             </div>
 
             <ul>
-                <li>
+                <li style=" margin-bottom: 10px;">
                     <a href="{{ route('doctor.dashboard') }}" class="{{ request()->routeIs('doctor.dashboard', 'doctor.findPatient', 'doctor.selectPatient', 'doctor.diagnosis', 'doctor.prescription',
                     'doctor.docRefill') ? 'active' : '' }}">
                         <img src="{{ asset('patient-list.png') }}" alt="Patient List Icon">
                         Patient List
                     </a>
                 </li>
-                <li>
+                <li style=" margin-bottom: 220px;">
                     <a href="{{ route('doctor.allPatients') }}" class="{{ request()->routeIs('doctor.allPatients', 'doctor.recordfindPatient', 'doctor.viewPatientRecord','doctor.viewExistingPatientRecord') ? 'active' : '' }}">
                         <img src="{{ asset('patient-records.png') }}" alt="Patient Records Icon">
                         Patient Records
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('doctor.account_settings') }}" class="{{ request()->routeIs('doctor.account_settings') ? 'active' : '' }}">
+                        <img src="{{ asset('settings.png') }}" alt="Account Settings Icon">
+                        Account Settings
                     </a>
                 </li>
                 <!-- Add more sidebar links here -->

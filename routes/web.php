@@ -36,6 +36,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::patch('/admin/update-status/{id}', [AdminController::class, 'updateStatus'])->name('admin.update-status');
     Route::get('/admin/patient-list', [AdminController::class, 'patientList'])->name('admin.patient-list');
     Route::get('/admin/prescription-list', [AdminController::class, 'prescriptionList'])->name('admin.prescription-list');
+    Route::post('/admin/reset-password/{id}', [AdminController::class, 'resetPassword'])->name('admin.reset_password');
 
 
 });
@@ -56,6 +57,8 @@ Route::middleware(['auth', 'doctor'])->group(function () {
     Route::get('doctor/records/dashboard', [DoctorController::class, 'allPatients'])->name('doctor.allPatients');
     Route::get('/doctor/patient/{id}/records', [DoctorController::class, 'viewPatientRecord'])->name('doctor.viewPatientRecord');
     Route::get('/doctor/patient/{patient_id}/record/{record_id}', [DoctorController::class, 'viewExistingPatientRecord'])->name('doctor.viewExistingPatientRecord');
+    Route::get('/doctor/account-settings', [DoctorController::class, 'accountSettings'])->name('doctor.account_settings');
+    Route::post('/doctor/change-password', [DoctorController::class, 'changePassword'])->name('doctor.change_password');
 
 });
 
@@ -79,6 +82,8 @@ Route::middleware(['auth', 'nurse'])->group(function () {
     Route::post('/nurse/refill', [NurseController::class, 'storeRefill'])->name('nurse.refill');
     Route::get('/nurse/patient-list', [NurseController::class, 'patient_list'])->name('nurse.patient_list');
     Route::get('/find-patientrecord', [NurseController::class, 'findPatientRecord'])->name('nurse.findPatientRecord');
+    Route::get('/nurse/account-settings', [NurseController::class, 'accountSettings'])->name('nurse.account_settings');
+    Route::post('/nurse/change-password', [NurseController::class, 'changePassword'])->name('nurse.change_password');
 
 
 });

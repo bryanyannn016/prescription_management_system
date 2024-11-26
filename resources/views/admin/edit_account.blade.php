@@ -33,6 +33,8 @@
             </p>
         </div>
 
+        
+
         <!-- Email Field (Disabled) -->
         <div class="col-md-6 custom-margin-right" style="margin-top:100px;">
             <span class="required-asterisk">*</span><label for="email" class="label-color" style="font-weight:bold;">Email:</label>
@@ -68,15 +70,27 @@
                     <option value="Pinagkaisahan" {{ $user->health_facility == 'Pinagkaisahan' ? 'selected' : '' }}>Pinagkaisahan</option>
                 </select>
             
-                <div style="margin-left:380px; margin-top:280px;">
+                <div style="margin-left:380px; margin-top:250px;">
                     <button type="submit" class="btn btn-primary mt-3" style="margin-right:100px; background-color: #C6E0FF; border-color: #C6E0FF; color: #000; font-weight: bold">SUBMIT</button>
                     <button type="button" class="btn btn-secondary mt-3 ml-2" onclick="window.location.href='{{ route('admin.account-list') }}'" style="background-color: #C6E0FF; border-color: #C6E0FF; color: #000; font-weight: bold">CANCEL</button>
                 </div>
                 <!-- Submit Button -->
-                
-            </form>            
+            </form>     
+            
+    
+            
+           
         </div>
     </div>
+    <form action="{{ route('admin.reset_password', ['id' => $user->id]) }}" method="POST" id="reset-password-form">
+        @csrf
+        @method('POST')
+        <button type="submit" class="btn btn-warning mt-3 ml-2" 
+            style="background-color: #FFC107; border-color: #FFC107; color: #000; font-weight: bold; margin-left:300px; margin-top:20px;"
+            onclick="return confirm('Are you sure you want to reset the password for this user?')">
+            Reset Password
+        </button>
+    </form>
 </div>
 
 @endsection

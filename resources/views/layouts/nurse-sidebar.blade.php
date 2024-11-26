@@ -99,7 +99,7 @@
     }
 
     .sidebar ul li {
-        margin-bottom: 10px;
+        
         display: flex;
         align-items: center;
         justify-content: flex-start;
@@ -386,7 +386,7 @@
             </div>
 
             <ul>
-                <li>
+                <li style="margin-bottom: 10px;">
                     <a href="{{ route('nurse.dashboard') }}" 
                        class="{{ request()->routeIs('nurse.dashboard', 'nurse.createPatient', 'nurse.savePatient', 'nurse.admitPatient', 'nurse.findPatient', 'nurse.selectPatient', 'nurse.viewPatientRecord', 'nurse.viewExistingPatientRecord') ? 'active' : '' }}">
                         <img src="{{ asset('admitting.png') }}" alt="Admitting Icon">
@@ -394,19 +394,27 @@
                     </a>
                 </li>
                 
-                <li>
+                <li style="margin-bottom: 10px;">
                     <a href="{{ route('nurse.prescription_list') }}" class="{{ request()->routeIs('nurse.prescription_list', 'nurse.deferPatient', 'nurse.refillPatient', 'nurse.find_refillpatient') ? 'active' : '' }}">
                         <img src="{{ asset('prescription.png') }}" alt="Prescription Icon">
                         Prescription 
                     </a>
                 </li>
 
-                <li>
+                <li style="margin-bottom: 170px;">
                     <a href="{{ route('nurse.patient_list') }}" class="{{ request()->routeIs('nurse.patient_list', 'nurse.findPatientRecord') ? 'active' : '' }}">
                         <img src="{{ asset('patient-list.png') }}" alt="Patient List Icon">
                         Patient List
                     </a>
                 </li>
+
+                <li>
+                    <a href="{{ route('nurse.account_settings') }}" class="{{ request()->routeIs('nurse.account_settings') ? 'active' : '' }}">
+                        <img src="{{ asset('settings.png') }}" alt="Account Settings Icon">
+                        Account Settings
+                    </a>
+                </li>
+                
                 <!-- Add more sidebar links here -->
             </ul>
         </div>

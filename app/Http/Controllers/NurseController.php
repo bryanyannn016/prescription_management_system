@@ -11,6 +11,8 @@ use App\Models\User;
 use App\Models\Prescription; 
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log; 
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 use Carbon\Carbon; 
 use Illuminate\Support\Facades\Storage; 
@@ -733,6 +735,35 @@ public function findPatientRecord(Request $request)
 }
 
 
+public function accountSettings()
+{
+    // Assuming the logged-in user information is available via Auth
+    $user = auth()->user();
 
+    // Pass the user details to the blade view
+    return view('nurse.account_settings', compact('user'));
+}
 
+public function changePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => 'required',
+        'new_password' => 'required|confirmed|min:8',
+    ]);
+
+    $user = auth()->user();
+
+    // Check if the current password matches
+    if (!Hash::check($request->current_password, $user->password)) {
+        return back()->withErrors(['current_password' => 'Current password is incorrect.']);
+    }
+
+    // Update the password
+    $user->update([
+        'password' => Hash::make($request->new_password),
+    ]);
+
+    // Flash a success message
+    return redirect()->route('nurse.dashboard')->with('success', 'Password successfully changed.');
+}
 }

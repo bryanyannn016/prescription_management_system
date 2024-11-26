@@ -10,6 +10,7 @@ use App\Models\Prescription;
 use App\Models\Diagnosis;
 use App\Models\User;
 use App\Models\File; 
+use Illuminate\Support\Facades\Hash;
 
 class DoctorController extends Controller
 {
@@ -448,6 +449,38 @@ public function recordfindPatient(Request $request)
 
     // Pass data to the view
     return view('doctor.patient_record_view', compact('patient', 'record', 'diagnoses', 'prescriptions', 'files'));
+}
+
+public function accountSettings()
+{
+    // Assuming the logged-in user information is available via Auth
+    $user = auth()->user();
+
+    // Pass the user details to the blade view
+    return view('doctor.account_settings', compact('user'));
+}
+
+public function changePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => 'required',
+        'new_password' => 'required|confirmed|min:8',
+    ]);
+
+    $user = auth()->user();
+
+    // Check if the current password matches
+    if (!Hash::check($request->current_password, $user->password)) {
+        return back()->withErrors(['current_password' => 'Current password is incorrect.']);
+    }
+
+    // Update the password
+    $user->update([
+        'password' => Hash::make($request->new_password),
+    ]);
+
+    // Flash a success message
+    return redirect()->route('doctor.dashboard')->with('success', 'Password successfully changed.');
 }
 
 }
