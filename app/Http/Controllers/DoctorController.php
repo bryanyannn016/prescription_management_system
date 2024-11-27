@@ -225,6 +225,16 @@ public function storePrescription(Request $request)
     // Get the current date
     $currentDate = now();
 
+    // Retrieve the record using the provided record_id
+    $record = Record::find($validatedData['record_id']);
+    
+    // Ensure the record exists and the doctor_id is null before updating it
+    if ($record && !$record->doctor_id) {
+        // Set the doctor_id to the authenticated user's ID
+        $record->doctor_id = auth()->id();
+        $record->save(); // Save the updated record
+    }
+
     // Loop through diagnoses and store them
     foreach ($validatedData['diagnoses'] as $diagnosis) {
         // Ensure that the required fields exist
@@ -256,6 +266,7 @@ public function storePrescription(Request $request)
 
     return response()->json(['success' => true, 'message' => 'Prescription saved successfully!']);
 }
+
 
 public function docRefill(Request $request)
 {
@@ -300,16 +311,23 @@ public function submitRefill(Request $request, $recordId)
         $prescription->save();
     }
 
-    // Update the status in the records table
+    // Retrieve the record and update doctor_id and status
     $record = Record::find($recordId);
     if ($record) {
+        // Update the doctor_id to the authenticated user's ID
+        $record->doctor_id = auth()->id(); // Set the doctor_id to the authenticated user's ID
+        
+        // Update the status to 'Approved'
         $record->status = 'Approved';
+        
+        // Save the changes to the record
         $record->save();
     }
 
     // Redirect back to the doctor dashboard after updating
     return redirect()->route('doctor.dashboard')->with('success', 'Prescription refills updated successfully, and record status set to Approved.');
 }
+
 
 
 public function removePrescription($id)

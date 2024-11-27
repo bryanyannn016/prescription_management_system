@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log; 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use Carbon\Carbon; 
 use Illuminate\Support\Facades\Storage; 
@@ -147,6 +148,7 @@ class NurseController extends Controller
     $record->status = $request->input('service') === 'Medical Consultation (Face to Face)' ? 'Approved' : 'Pending'; // Determine status
     $record->date = now(); // Set current date
     $record->user_id = auth()->id(); 
+    $record->doctor_id = null;
     $record->save(); // Save the record
 
     // Handle file uploads
@@ -657,11 +659,16 @@ public function patient_list()
     // Get the health facility of the currently authenticated user
     $userHealthFacility = auth()->user()->health_facility;
 
+    // Get today's date in the format 'Y-m-d' (you can modify the format based on your database column type)
+    $today = Carbon::today();
+
     // Retrieve all records where the associated user's health facility matches the auth user's
+    // and the record's created_at is today's date
     $records = Record::whereHas('user', function($query) use ($userHealthFacility) {
             $query->where('health_facility', $userHealthFacility);
         })
-        ->select('id', 'service', 'status', 'patient_id', 'created_at', 'user_id')
+        ->whereDate('date', $today) // Add this line to filter by today's date
+        ->select('id', 'service', 'status', 'patient_id', 'date', 'user_id')
         ->get();
 
     // Loop through records to add patient information based on patient_id
@@ -766,4 +773,60 @@ public function changePassword(Request $request)
     // Flash a success message
     return redirect()->route('nurse.dashboard')->with('success', 'Password successfully changed.');
 }
+
+public function printRecord($recordId)
+{
+    // Fetch the record and associated patient
+    $record = Record::findOrFail($recordId);
+    $patient = $record->patient;
+
+    if (!$patient) {
+        return redirect()->back()->with('error', 'Patient details not found!');
+    }
+
+    // Fetch prescriptions associated with the record_id
+    $prescriptions = Prescription::where('record_id', $recordId)->get();
+
+    if ($prescriptions->isEmpty()) {
+        return redirect()->back()->with('error', 'No prescriptions found for this record!');
+    }
+
+    // Get the date from the record
+    $recordDate = $record->date;
+    $recordDoctorId = $record->doctor_id;
+
+    // Fetch doctor's details from the users table using the doctor_id
+    $doctor = User::find($recordDoctorId);
+
+    if (!$doctor) {
+        return redirect()->back()->with('error', 'Doctor details not found!');
+    }
+
+    // Prepare data for the PDF
+    $data = [
+        'first_name' => $patient->first_name,
+        'middle_name' => $patient->middle_name,
+        'last_name' => $patient->last_name,
+        'age' => $patient->age,
+        'sex' => $patient->sex,
+        'address' => $patient->address,
+        'prescriptions' => $prescriptions, // Add prescriptions data here
+        'record_date' => $recordDate,
+        'doctor_first_name' => $doctor->first_name, // Doctor's first name
+        'doctor_middle_name' => $doctor->middle_name, // Doctor's middle name
+        'doctor_last_name' => $doctor->last_name, // Doctor's last name
+    ];
+
+    // Generate PDF using the PDF library
+    $pdf = PDF::loadView('nurse.print', $data);
+
+    // Stream the PDF
+    return $pdf->stream('Prescription.pdf');
+}
+
+
+
+
+
+
 }

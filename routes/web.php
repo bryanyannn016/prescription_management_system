@@ -84,6 +84,7 @@ Route::middleware(['auth', 'nurse'])->group(function () {
     Route::get('/find-patientrecord', [NurseController::class, 'findPatientRecord'])->name('nurse.findPatientRecord');
     Route::get('/nurse/account-settings', [NurseController::class, 'accountSettings'])->name('nurse.account_settings');
     Route::post('/nurse/change-password', [NurseController::class, 'changePassword'])->name('nurse.change_password');
+    Route::get('/nurse/print/{record}', [NurseController::class, 'printRecord'])->name('nurse.printRecord');
 
 
 });

@@ -76,19 +76,29 @@
                         <td>
                             @if($record->status == 'Approved')
                                 @if($record->service == 'Refill')
-                                    <!-- Show Print button for 'Refill' service and 'Approved' status -->
-                                    <button  class="btn btn-secondary" style="border-color: #C6E0FF; background-color: #C6E0FF; color: #000; font-weight:bold;">PRINT</button>
+                                    <!-- Form for PRINT button -->
+                                    <form action="{{ route('nurse.printRecord', $record->id) }}" method="GET" target="_blank">
+                                        <button type="submit" class="btn btn-secondary" style="border-color: #C6E0FF; background-color: #C6E0FF; color: #000; font-weight: bold;">
+                                            PRINT
+                                        </button>
+                                    </form>
                                 @elseif($record->service == 'Medical Consultation (Face to Face)')
                                     <!-- Check if the record_id exists in the prescriptions table -->
                                     @php
                                         $prescription = \App\Models\Prescription::where('record_id', $record->id)->first();
                                     @endphp
                                     @if($prescription)
-                                        <button  class="btn btn-secondary" style="border-color: #C6E0FF; background-color: #C6E0FF; color: #000; font-weight:bold;">PRINT</button>
+                                        <!-- Form for PRINT button -->
+                                        <form action="{{ route('nurse.printRecord', $record->id) }}" method="GET" target="_blank">
+                                            <button type="submit" class="btn btn-secondary" style="border-color: #C6E0FF; background-color: #C6E0FF; color: #000; font-weight: bold;">
+                                                PRINT
+                                            </button>
+                                        </form>
                                     @endif
                                 @endif
                             @endif
                         </td>
+                        
                     </tr>
                 @endforeach
             </tbody>

@@ -15,6 +15,7 @@ class CreateRecordsTable extends Migration
             $table->string('service');
             $table->string('status')->default('Pending'); // Default status to Pending
             $table->date('date')->default(now()); // Current date
+            $table->string('doctor_id')->nullable();
             $table->timestamps();
         });
     }
