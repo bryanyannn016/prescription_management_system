@@ -22,6 +22,7 @@ class User extends Authenticatable
         'password',
         'type',
         'health_facility',
+        'license_no',
         'status',
     ];
 

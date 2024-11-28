@@ -16,6 +16,7 @@ class AdminSeeder extends Seeder
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
             'type' => 'admin',
+            'license_no' => '123456789',
             'health_facility' => 'Bangkal Health Center',
         ]);
     }

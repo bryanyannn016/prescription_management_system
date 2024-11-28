@@ -46,6 +46,12 @@
                 </select>
             </div>
             <div class="mb-4">
+                <label for="license_no" class="form-label custom-label">
+                    <span class="required-asterisk">*</span> License No.:
+                </label>
+                <input type="text" class="form-control custom-input" id="license_no" name="license_no" placeholder="License Number" required>
+            </div>
+            <div class="mb-4">
                 <label for="health_facility" class="form-label custom-label">
                     <span class="required-asterisk">*</span> Health Facility:
                 </label>

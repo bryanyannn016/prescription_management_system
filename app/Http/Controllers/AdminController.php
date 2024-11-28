@@ -54,6 +54,7 @@ class AdminController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'type' => 'required|in:doctor,nurse',
+            'license_no' => 'required|string|max:255',
             'health_facility' => 'nullable|string|max:255',
         ]);
 
@@ -68,6 +69,7 @@ class AdminController extends Controller
             'email' => $request->input('email'),
             'password' => Hash::make('defaultpassword'), // You can set a default password or generate one
             'type' => $request->input('type'),
+            'license_no' => $request->input('license_no'),
             'health_facility' => $healthFacilityName, // Store the display name
         ]);
 

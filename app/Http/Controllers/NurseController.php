@@ -814,7 +814,8 @@ public function printRecord($recordId)
         'record_date' => $recordDate,
         'doctor_first_name' => $doctor->first_name, // Doctor's first name
         'doctor_middle_name' => $doctor->middle_name, // Doctor's middle name
-        'doctor_last_name' => $doctor->last_name, // Doctor's last name
+        'doctor_last_name' => $doctor->last_name, 
+        'doctor_license_no' => $doctor->license_no,// Doctor's last name
     ];
 
     // Generate PDF using the PDF library
