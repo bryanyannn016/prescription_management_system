@@ -205,18 +205,26 @@
                     </tbody>
                 </table>
 
-                <div class="form-group mt-3" style="margin-top:50px; margin-bottom:200px;">
+                <div class="form-group mt-3" style="margin-top:50px; margin-bottom:150px;">
                     <label for="refillDate" class="label-color"><strong>Refill Date:</strong></label>
                     <input type="date" id="refillDate" name="refill_date" class="form-control" 
                         value="{{ $refillDate }}" 
-                        min="{{ \Carbon\Carbon::tomorrow()->format('Y-m-d') }}" required>
+                        min="{{ \Carbon\Carbon::tomorrow()->format('Y-m-d') }}" style="margin-right:20px;" required>
+                    
+                        <button type="button" class="btn btn-warning mt-3" onclick="window.location.href='{{ route('doctor.deferred', $record->id) }}'" style="background-color: #C6E0FF; border-color: #C6E0FF; color: #000; font-weight: bold; margin-botton:150px;">DEFER</button>
+
                 </div>
 
+
+
                 <!-- Buttons container -->
+                <!-- Deferred Button -->
                 <div style="display: flex; gap: 10px;">
                     <button type="submit" class="btn btn-primary mt-3" style="background-color: #C6E0FF; border-color: #C6E0FF; color: #000; font-weight: bold; margin-left:300px; margin-right:200px;">SUBMIT</button>
                     <button type="button" class="btn btn-danger" onclick="window.location.href='{{ route('doctor.dashboard') }}'" style="background-color: #C6E0FF; border-color: #C6E0FF; color: #000; font-weight: bold">BACK</button>
+                    <!-- New Deferred Button -->
                 </div>
+
             </form>
             
         </div>

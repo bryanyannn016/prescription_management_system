@@ -97,7 +97,9 @@
                         <td>{{ $patient->age }}</td>
                         <td>{{ $patient->barangay }}</td>
                         <td>
-                            @if($record && !$record->has_prescription)
+                            @if($record && $record->status === 'Deferred')
+                                <span class="text-muted" style="font-weight: bold">DONE</span>
+                            @elseif($record && !$record->has_prescription && $record->status === 'Pending')
                                 <form action="{{ route('nurse.refillPatient') }}" method="GET">
                                     <input type="hidden" name="patient_id" value="{{ $patient->id }}">
                                     <input type="hidden" name="record_id" value="{{ $record->id }}">
@@ -109,6 +111,9 @@
                                 <span class="text-muted" style="font-weight: bold">DONE</span>
                             @endif
                         </td>
+                        
+                        
+                        
                     </tr>
                 @endforeach
             </tbody>

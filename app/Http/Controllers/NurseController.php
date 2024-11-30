@@ -382,7 +382,7 @@ public function prescriptionList()
         ->whereHas('user', function ($query) use ($userHealthFacility) {
             $query->where('health_facility', $userHealthFacility);
         })
-        ->get(['id', 'patient_id']); // Get both record_id and patient_id
+        ->get(['id', 'patient_id', 'status']); // Include 'status'
 
     // Get refill patients from the prescription table with today's refill date
     $refillPatients = Prescription::where('refill_date', $today)
@@ -413,6 +413,7 @@ public function prescriptionList()
 
     // Check for each admitted patient's record_id in the prescriptions table
     $admitPatientRecords = $admitPatients->map(function ($record) {
+        // Add 'has_prescription' and retain 'status'
         $record->has_prescription = Prescription::where('record_id', $record->id)->exists();
         return $record;
     });

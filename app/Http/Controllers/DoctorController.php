@@ -328,6 +328,22 @@ public function submitRefill(Request $request, $recordId)
     return redirect()->route('doctor.dashboard')->with('success', 'Prescription refills updated successfully, and record status set to Approved.');
 }
 
+public function deferred($recordId)
+{
+    // Remove all prescriptions associated with the record ID
+    Prescription::where('record_id', $recordId)->delete();
+
+    // Update the status of the record to 'Deferred'
+    $record = Record::find($recordId);
+    if ($record) {
+        $record->status = 'Deferred';
+        $record->save();
+    }
+
+    // Redirect back to the doctor dashboard with a success message
+    return redirect()->route('doctor.dashboard')->with('success', 'Prescriptions have been deferred, and the record status has been updated to Deferred.');
+}
+
 
 
 public function removePrescription($id)

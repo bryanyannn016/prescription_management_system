@@ -57,7 +57,7 @@
                 <label for="mhp_exp" class="form-label custom-label">
                     <span class="required-asterisk">*</span> MHP Exp:
                 </label>
-                <input type="date" class="form-control custom-input" id="mhp_exp" name="mhp_exp" required>
+                <input type="date" class="form-control custom-input" id="mhp_exp" name="mhp_exp" min="{{ \Carbon\Carbon::tomorrow()->format('Y-m-d') }}" required>
             </div>
             <div class="mb-4">
                 <label for="address" class="form-label custom-label">

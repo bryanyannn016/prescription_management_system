@@ -97,7 +97,7 @@
                 <!-- Refill Date Input -->
                 <div class="refill-date-container" id="refill-date-container">
                     <label for="refill-date" class="text-color">Refill Date:</label>
-                    <input type="date" id="refill-date" class="form-control" placeholder="Select refill date">
+                    <input type="date" id="refill-date" class="form-control" min="{{ \Carbon\Carbon::tomorrow()->format('Y-m-d') }}"  placeholder="Select refill date">
                 </div>
 
                 <!-- Buttons for Submit and Back -->

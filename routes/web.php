@@ -59,6 +59,7 @@ Route::middleware(['auth', 'doctor'])->group(function () {
     Route::get('/doctor/patient/{patient_id}/record/{record_id}', [DoctorController::class, 'viewExistingPatientRecord'])->name('doctor.viewExistingPatientRecord');
     Route::get('/doctor/account-settings', [DoctorController::class, 'accountSettings'])->name('doctor.account_settings');
     Route::post('/doctor/change-password', [DoctorController::class, 'changePassword'])->name('doctor.change_password');
+    Route::get('/doctor/deferred/{recordId}', [DoctorController::class, 'deferred'])->name('doctor.deferred');
 
 });
 

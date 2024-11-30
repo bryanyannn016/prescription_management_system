@@ -298,7 +298,16 @@ public function patientList(Request $request)
     $query = DB::table('records')
         ->join('patients', 'records.patient_id', '=', 'patients.id')
         ->join('users', 'records.user_id', '=', 'users.id')
-        ->select('records.service', 'records.date', 'patients.first_name', 'patients.middle_name', 'patients.last_name', 'users.health_facility');
+        ->select(
+            'records.service',
+            'records.date',
+            'records.status', // Include the status field
+            'patients.first_name',
+            'patients.middle_name',
+            'patients.last_name',
+            'users.health_facility'
+        )
+        ->where('records.status', '!=', 'Deferred'); // Exclude Deferred records
 
     // Apply filters if they are provided
     if ($request->has('health_facility') && $request->health_facility != '') {
@@ -317,12 +326,12 @@ public function patientList(Request $request)
 
     // Search functionality: check if a search term is provided
     if ($request->has('search') && $request->search != '') {
-        // Search by first_name, middle_name, or last_name (you can adjust this to search other fields as well)
+        // Search by first_name, middle_name, or last_name
         $searchTerm = $request->search;
-        $query->where(function($q) use ($searchTerm) {
+        $query->where(function ($q) use ($searchTerm) {
             $q->where('patients.first_name', 'LIKE', "%$searchTerm%")
-              ->orWhere('patients.middle_name', 'LIKE', "%$searchTerm%")
-              ->orWhere('patients.last_name', 'LIKE', "%$searchTerm%");
+                ->orWhere('patients.middle_name', 'LIKE', "%$searchTerm%")
+                ->orWhere('patients.last_name', 'LIKE', "%$searchTerm%");
         });
     }
 
@@ -334,6 +343,7 @@ public function patientList(Request $request)
 
     return view('admin.patient_list', compact('records', 'healthFacilities', 'years'));
 }
+
 
 
 

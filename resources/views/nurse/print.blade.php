@@ -35,8 +35,10 @@ body {
 }
 
 .row {
+  margin-top:100px;
   margin-bottom: 20px;
-  margin-left:20px;
+  border-top: 1px solid #ccc;
+  margin-left:30px;
 }
 
 h3 {
@@ -48,11 +50,9 @@ h3 {
 }
 
 
-
-
 .site-header { 
-  border-bottom: 1px solid #ccc;
   padding: .2em 1em;
+  
 }
 
 
@@ -70,11 +70,6 @@ h3 {
 }
 
 
-h3 {
-  font-size: 1.2em;
-  color: #286187;
-  margin: 0; /* Remove default margin */
-}
 
 
 </style>
@@ -83,13 +78,20 @@ h3 {
 
   <header class="site-header">
     <div class="site-identity">
-      <img src="makatideplogo.png" alt="Makati Dep Logo" style="width: 90px; height:90px;margin-right: 40px; margin-left:20px;" />
-      <strong><h1>MAKATI HEALTH DEPARTMENT</h1></strong>
-      <img src="planetdrug.jpg" alt="PlanetDrugLogo" style="width:70px; height:70px; margin-left:40px;"/>
+      <img src="makatideplogo.png" alt="Makati Dep Logo" style="width: 100px; height:90px;margin-right: 40px; margin-left:20px;" />
       
+      <!-- Updated the h1 to use span and break line between the two texts -->
+      <strong>
+        <h1>
+          <span style="display: block; text-align: center;">MAKATI HEALTH DEPARTMENT</span>
+          <span style="display: block; text-align: center;">Planet Drugstore Corp.</span>
+        </h1>
+      </strong>
+      
+      <img src="planetdrug.jpg" alt="PlanetDrugLogo" style="width:75px; height:90px; margin-left:40px;"/>
     </div>  
-    <h3 style="margin-left:200px;">PLANET DRUGSTORE CORP.</h3>
   </header>
+  
 
 <div class="row">
     <div class="image-container">
