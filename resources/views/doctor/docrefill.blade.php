@@ -198,7 +198,7 @@
                                     <input type="checkbox" name="refillable[{{ $prescription->id }}]" {{ $prescription->refillable ? 'checked' : '' }} style="margin-left:30px;">
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-danger btn-sm remove-prescription" id="delete" name="delete" onclick="onDelete({{ $prescription->id }})" style="margin-left:10px; background-color: #C6E0FF; border-color: #C6E0FF; color: #000; font-weight: bold">Remove</button>
+                                    <button type="button" class="btn btn-danger btn-sm remove-prescription" id="delete" name="delete" onclick="onDelete({{ $prescription->id }})" style="margin-left:10px; background-color: #C6E0FF; border-color: #C6E0FF; color: #000; font-weight: bold;">Remove</button>
                                 </td>
                             </tr>
                         @endforeach

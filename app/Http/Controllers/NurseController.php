@@ -612,7 +612,21 @@ public function refillPatient(Request $request)
         return redirect()->back()->with('error', 'No previous record found for this patient.');
     }
 
-    // Fetch refillable prescriptions using the previous record ID
+    // Check if the status of the previous record is 'Deferred'
+    if ($previousRecord->status === 'Deferred') {
+        // Get the next previous record (if any)
+        $previousRecord = Record::where('patient_id', $patientId)
+            ->where('id', '<', $previousRecord->id)
+            ->latest('id') // Sort by most recent
+            ->first();
+
+        // If there is no next previous record, return an error
+        if (!$previousRecord) {
+            return redirect()->back()->with('error', 'No previous record found to fetch medications.');
+        }
+    }
+
+    // Fetch refillable prescriptions using the (possibly updated) previous record ID
     $prescriptions = Prescription::where('record_id', $previousRecord->id)
         ->where('isRefillable', true)
         ->get();
@@ -620,6 +634,7 @@ public function refillPatient(Request $request)
     // Pass the patient details, record, and prescriptions to the refill view
     return view('nurse.refill', compact('patient', 'record', 'prescriptions'));
 }
+
 
 public function storeRefill(Request $request)
 {
