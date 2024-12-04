@@ -4,7 +4,7 @@
     </IfModule>
     RewriteEngine On
 
-    Options +FollowSymLinks
+    DirectoryIndex index.php  
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
