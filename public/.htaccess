@@ -1,26 +1,20 @@
 <IfModule mod_rewrite.c>
-    # Disable multi-view and directory listing
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
     </IfModule>
-
-    # Enable mod_rewrite engine
     RewriteEngine On
 
-    # Set the default index file
-    DirectoryIndex index.php
+    DirectoryIndex index.php  
 
-    # Handle Authorization Header (important for APIs)
+    # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-
-    # Redirect Trailing Slashes If Not A Folder (ensures clean URLs without trailing slashes)
+    # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
-
-    # Send Requests To Front Controller (index.php)
+    # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^ public/index.php [L]
+    RewriteRule ^ index.php [L]
 </IfModule>
