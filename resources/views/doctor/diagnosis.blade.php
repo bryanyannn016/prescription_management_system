@@ -78,8 +78,8 @@
 
             <input type="hidden" name="patient_id" value="{{ $patient->id }}">
             <input type="hidden" name="record_id" value="{{ $record->id }}">
-            <button type="button" class="btn btn-success mt-3" id="next-btn" style="margin-top:200px; margin-left:300px; margin-right:50px; background-color: #C6E0FF; border:#C6E0FF; font-weight: bold; color: #000; width:90px;">NEXT</button> <!-- Added Next Button -->
-            <button type="button" class="btn btn-danger mt-3" id="cancel-btn" style="font-weight: bold; color: #000; width:90px;"onclick="window.location.href='{{ route('doctor.dashboard') }}'">CANCEL</button>
+            <button type="button" class="btn btn-success mt-3" id="next-btn" style="margin-top:200px; margin-left:400px; margin-right:50px; background-color: #C6E0FF; border:#C6E0FF; font-weight: bold; color: #000; width:90px;">NEXT</button> <!-- Added Next Button -->
+            <button type="button" class="btn btn-danger mt-3" id="cancel-btn" style="font-weight: bold; color: #000; width:90px; margin-bottom:20px;"onclick="window.location.href='{{ route('doctor.dashboard') }}'">CANCEL</button>
         </div>
 
         <div class="col-md-6">

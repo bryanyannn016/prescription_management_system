@@ -219,7 +219,6 @@
     border-collapse: collapse; /* Collapses borders for a seamless design */
     width: 100%; /* Ensures the table takes full width */
     table-layout: fixed; /* Ensures fixed column layout */
-    height: 10%; /* Adjusts height based on content */
     margin-top: 30px; /* Adds spacing at the top */
 }
 
@@ -237,15 +236,22 @@
 
 .account-table td {
     vertical-align: middle; /* Ensure vertical alignment in cells */
+    word-wrap: break-word; /* Breaks long words in all cells */
+    overflow: hidden; /* Hides overflowing content */
+    text-overflow: ellipsis; /* Adds ellipsis for overflow */
 }
 
-.account-table tr {
-    height: 40px; /* Adjust height as needed */
+.email-column {
+    max-width: 150px; /* Set a max width for email column */
+    white-space: nowrap; /* Prevents wrapping */
+    overflow: hidden; /* Hides overflowing content */
+    text-overflow: ellipsis; /* Adds ellipsis for long emails */
 }
 
 .account-table tr:hover {
     background-color: #f1f8ff; /* Adds a subtle hover effect */
 }
+
 
 .account-table .action-buttons {
     display: flex; /* Display buttons in row */

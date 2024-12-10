@@ -217,7 +217,7 @@
                         Patient List
                     </a>
                 </li>
-                <li style=" margin-bottom: 220px;">
+                <li style=" margin-bottom: 180px;">
                     <a href="{{ route('doctor.allPatients') }}" class="{{ request()->routeIs('doctor.allPatients', 'doctor.recordfindPatient', 'doctor.viewPatientRecord','doctor.viewExistingPatientRecord') ? 'active' : '' }}">
                         <img src="{{ asset('patient-records.png') }}" alt="Patient Records Icon">
                         Patient Records

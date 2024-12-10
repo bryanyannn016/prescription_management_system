@@ -401,7 +401,7 @@
                     </a>
                 </li>
 
-                <li style="margin-bottom: 170px;">
+                <li style="margin-bottom: 130px;">
                     <a href="{{ route('nurse.patient_list') }}" class="{{ request()->routeIs('nurse.patient_list', 'nurse.findPatientRecord') ? 'active' : '' }}">
                         <img src="{{ asset('patient-list.png') }}" alt="Patient List Icon">
                         Patient List

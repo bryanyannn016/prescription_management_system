@@ -95,14 +95,15 @@
                 </thead>
                 <tbody>
                     @foreach ($files as $file)
-                        <tr>
-                            <td>{{ $file->file_path }}</td>
-                            <td>
-                                <a href="{{ route('files.view', $file->id) }}" class="btn btn-link btn-sm">
-                                    <img src="{{ asset('view.png') }}" alt="View" style="width: 25px; height: 25px;"/>
-                                </a>
-                            </td>
-                        </tr>
+                    <tr>
+                        <!-- Use basename() or Str::after() to extract just the file name -->
+                        <td>{{ basename($file->file_path) }}</td>
+                        <td>
+                            <a href="{{ route('files.view', $file->id) }}" class="btn btn-link btn-sm">
+                                <img src="{{ asset('view.png') }}" alt="View" style="width: 25px; height: 25px;"/>
+                            </a>
+                        </td>
+                    </tr>
                     @endforeach
                 </tbody>
             </table>

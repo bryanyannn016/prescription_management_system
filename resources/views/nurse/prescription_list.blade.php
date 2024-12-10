@@ -11,7 +11,7 @@
     width: 80%; /* Make sure table takes full width */
     table-layout: fixed; /* Fixes the layout of the table */
     height: 20%;
-    margin-top: 10px;
+    margin-top: 2px;
 }
 
 .refillpatient-table th, .refillpatient-table td {

@@ -104,7 +104,7 @@ class NurseController extends Controller
     // Validate incoming request
     $request->validate([
         'service' => 'required|string|max:255',
-        'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', // Validate multiple files
+        'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:4096', // Validate multiple files
     ]);
 
     // Retrieve patient data from session

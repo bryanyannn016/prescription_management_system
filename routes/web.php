@@ -96,3 +96,6 @@ Route::get('/file/{id}', [FileController::class, 'show'])->name('files.view');
 Route::get('/', function () {
     return view('auth.login');
 });
+
+
+URL::forceScheme('https');

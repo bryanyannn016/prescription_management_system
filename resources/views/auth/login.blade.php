@@ -23,7 +23,7 @@
             display: flex;
             justify-content: center; /* Center elements horizontally */
             align-items: center; /* Center elements vertically */
-            width: 100%; /* Full width */
+            width: 97.8%; /* Full width */
             height: 80px; /* Added height */
         }
     
