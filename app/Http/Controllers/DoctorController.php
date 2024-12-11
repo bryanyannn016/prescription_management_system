@@ -282,7 +282,7 @@ public function docRefill(Request $request)
     // Get the refill date from one of the prescriptions (assuming they share the same date)
     $refillDate = $prescriptions->first()->refill_date ?? null;
 
-    return view('doctor.docRefill', compact('patient', 'record', 'prescriptions', 'refillDate'));
+    return view('doctor.docrefill', compact('patient', 'record', 'prescriptions', 'refillDate'));
 }
 
 public function submitRefill(Request $request, $recordId)
